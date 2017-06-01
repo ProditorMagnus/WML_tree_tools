@@ -1,0 +1,4 @@
+nppBackup
+*.txt
+ignored
+__pycache__
