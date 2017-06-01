@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+from os.path import join
 import wmlparser3
 
 mode = 0b01000000 # show debug | show real | show extra log | something for future if needed
 
 main = wmlparser3.Parser()
 
-root_node = main.parse_file(r"C:\Users\Ravana\Desktop\general\wesnoth-related\dev1.13.8\parse_tree\ageless_preprocessed\_main.cfg")
+root_node = main.parse_file(join("..","preprocessed_addon","_main.cfg"))
 
+# debug = mode & 0b10000000, debug and print()
 def debug():
 	return mode & 0b10000000
 

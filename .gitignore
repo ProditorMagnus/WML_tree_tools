@@ -2,3 +2,4 @@ nppBackup
 *.txt
 ignored
 __pycache__
+_main.cfg.plain
