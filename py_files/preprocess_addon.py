@@ -7,14 +7,12 @@ wesnoth_path = join(wesnoth_dir,"wesnoth.exe")
 core_path = join(wesnoth_dir,"data")
 
 core_out_path = join("..","core")
-input_path = join("..","unprocessed_addon")
-addon_out_path = join("..","preprocessed_addon")
 
-for addon_folder in os.listdir(input_path):
-	input_path = join(input_path, addon_folder)
-	print("Found addon",input_path)
-	break
+# it must be in actual userdata
+userdata_path = r"C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6\userdata"
+input_path = r"C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6\userdata\data\add-ons\Ageless_Era"
+addon_out_path = join("..","preprocessed_addon")
 
 call([wesnoth_path, "--preprocess-defines", "MULTIPLAYER", "-p", core_path, core_out_path, "--preprocess-output-macros"])
 
-call([wesnoth_path, "--preprocess-defines", "MULTIPLAYER", "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path, addon_out_path])
+call([wesnoth_path, "--userdata-dir", userdata_path, "--preprocess-defines", "MULTIPLAYER,SKIP_CORE", "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path, addon_out_path])
