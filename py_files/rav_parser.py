@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from os.path import join
+import pickle
+from os.path import join, isfile
 import wmlparser3
+#		 01234567
+mode = 0b10001000 # program settings
+# 0: show debug
+# 1: show real
+# 2: show extra
+# 3: not used
+# 4: cache
+# 5: check performance
 
-mode = 0b10000000 # show debug | show real | show extra log | dryrun, do not parse | something for future if needed
+# takes more room this way, consider putting them to separate variables
 def debug():
 	return mode & 0b10000000
 
@@ -14,13 +23,27 @@ def prod():
 def extra():
 	return mode & 0b00100000
 
-def dryrun():
+def _reserved_mode_():
 	return mode & 0b00010000
 
-main = wmlparser3.Parser()
+def cache():
+	return mode & 0b00001000
 
-if not dryrun(): 
+def perf():
+	return mode & 0b00000100
+
+if not cache():
+	main = wmlparser3.Parser()
 	root_node = main.parse_file(join("..","preprocessed_addon","_main.cfg"))
+else:
+	if isfile("node_cache.pickle"):
+		with open("node_cache.pickle", "rb") as f:
+			root_node = pickle.load(f)
+	else:
+		main = wmlparser3.Parser()
+		root_node = main.parse_file(join("..","preprocessed_addon","_main.cfg"))
+		with open("node_cache.pickle", "wb") as f:
+			pickle.dump(root_node)
 
 # debug = mode & 0b10000000, debug and print()
 
@@ -40,7 +63,7 @@ def explore_wml(node, path):
 			if extra(): print("getting name failed for",printable_path)
 			node.name = "no_name_defined"
 			name = "no_name_defined"
-					
+
 		if name == "event":
 			if node.get_text_val("id") is None:
 				if "unit_type" in printable_path:
@@ -48,7 +71,7 @@ def explore_wml(node, path):
 					if prod(): print("MISSING_ID:",find_inner_from_path(path, "unit_type").get_text_val("id"),":",node.get_text_val("name"))
 				else:
 					if extra(): print("found event without id at",printable_path, node.get_text_val("name"), node.debug()[:100])
-				
+
 				# input()
 		for child in node.get_all():
 			explore_wml(child, path+[child])
@@ -75,7 +98,7 @@ def query_matches(node, path, query):
 			tag_pos+=1
 			found_pos+=1
 		else:
-			if extra(): 
+			if extra():
 				print("* not supported", tag_path, query_path)
 				input()
 			return False
@@ -95,17 +118,57 @@ def query_matches(node, path, query):
 		if attr_value is not None and attr_wanted=="*":
 			return True
 		else:
-			if extra(): 
+			if extra():
 				print("attr check not finished")
 				print("got",attr_value, "wanted", attr_wanted)
 				input()
 			if attr_value != attr_wanted:
 				# print("got",attr_value, "wanted", attr_wanted)
 				return False
-	
+
 	return True
-	
+
+def path_invalidates_match(path, query_path):
+	path = [n.get_name() for n in path]
+	# if there is no way that this path can match query
+
+	if extra(): print("inside path_invalidates_match",path, query_path)
+
+
+	if len(path) < len([tag for tag in query_path if tag != "*"]):
+		if extra(): print("path is too short to be possible match", path, query_path)
+		return False
+
+	star_open = False
+	p = 0
+	q = 0
+	while q < len(query_path):
+		# remember that any amount is allowed, and skip if there are multiple
+		if query_path[q] == "*":
+			print("start_found")
+			star_open = True
+			q += 1
+		elif path[p] == query_path[q]:
+			# matches, so advance past this, close star if it was open
+			# therefore, nongreedy match only supported
+			star_open = False
+			q += 1
+			p += 1
+		elif star_open:
+			# advance haystick position
+			print("star_open")
+			p += 1
+		else:
+			# different tag than was was expected
+			if extra(): print("different tag than expected",path[p])
+			return True
+	return False
+
 def find_from_wml(node, path, query):
+	# print("searching",[n.get_name() for n in path], query)
+	if path_invalidates_match(path, query[0]):
+		if extra(): print("path invalidates match")
+		return
 	if len(path) > len(query[0]) and not "*" in query[0]:
 		# only looked trees of limited depth
 		return
@@ -146,8 +209,17 @@ def parse_wml_query(query):
 
 # explore_wml(root_node, [])
 # query made of tag path, ending with single attribute request
+# make query list of queries
 query = parse_wml_query("[units]>[unit_type]>[attack]>damage==25")
 print(query)
 # print(query_matches(None, ["unit_type", "attack", "specials"], query))
 
-find_from_wml(root_node, [], query)
+if perf():
+	import timeit
+	start_time = timeit.default_timer()
+	find_from_wml(root_node, [], query)
+	elapsed = timeit.default_timer() - start_time
+	print(elapsed) # 1.1117582430399235, 0.9999734076674559, 1.1983144193424229, 1.0922506677241397
+	# and when removed that check 0.9830210289366565, 0.9595633259076966,
+else:
+	find_from_wml(root_node, [], query)

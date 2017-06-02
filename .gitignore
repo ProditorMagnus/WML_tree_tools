@@ -6,3 +6,5 @@ _main.cfg.plain
 preprocessed_addon
 unprocessed_addon
 core
+*.pickle
+.idea
