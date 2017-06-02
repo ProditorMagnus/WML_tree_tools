@@ -88,7 +88,9 @@ def query_matches(node, path, query):
 	# check attribute then
 	attr_query = query[1]
 	if attr_query is not None:
-		attr_value = path[found_pos-1].get_text_val(attr_query[0])
+		if node.get_name() != attr_query[0]:
+			return False
+		attr_value = node.get_text()
 		attr_wanted = attr_query[1]
 		if attr_value is not None and attr_wanted=="*":
 			return True
@@ -144,7 +146,7 @@ def parse_wml_query(query):
 
 # explore_wml(root_node, [])
 # query made of tag path, ending with single attribute request
-query = parse_wml_query("[units]>[unit_type]>[attack]>damage==12")
+query = parse_wml_query("[units]>[unit_type]>[attack]>damage==25")
 print(query)
 # print(query_matches(None, ["unit_type", "attack", "specials"], query))
 
