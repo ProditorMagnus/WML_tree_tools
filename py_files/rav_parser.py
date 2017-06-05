@@ -141,12 +141,25 @@ def find_from_wml(node, path, query):
                 find_from_wml(child, path, query)
     elif isinstance(node, wmlparser3.AttributeNode):
         if query_matches(node, path, query):
-            printable_ids = [n.get_text_val("id") for n in path]
+            printable_ids = []
+            for n in path:
+                printable_values = []
+                for output_key in query[2]:
+                    val = n.get_text_val(output_key)
+                    if val is not None:
+                        printable_values.append((output_key, val))
+                printable_ids.append(printable_values)
+
             if prod(): print("found match at", printable_path, printable_ids)
-            if debug(): print(node.get_name(), node.get_text())
+            if extra(): print(node.get_name(), node.get_text())
 
 
 def parse_wml_query(query):
+    output_keys = "id"
+    if "~" in query:
+        query, output_keys = query.split("~", 1)
+        output_keys = output_keys.split(",")
+
     operators = {
         "==": lambda x, y: y == x,
         "!=": lambda x, y: y != x,
@@ -175,24 +188,28 @@ def parse_wml_query(query):
             for operator in sorted(operators, key=lambda x: len(x[0])):
                 if operator in item:
                     item = item.split(operator, 1)
+                    try:
+                        item[1] = int(item[1])
+                    except:
+                        pass
                     attr_wanted = [item[0], lambda x: operators[operator](item[1], x)]
                     break
         if attr_wanted is None:
             attr_wanted = (item, lambda x: True)
-    return [path_wanted, attr_wanted]
+    return [path_wanted, attr_wanted, output_keys]
 
 
 # query made of tag path, ending with single attribute request
 # make query list of queries, used as and conditions
 # query = parse_wml_query(">[damage]>add==1")
-parsed_query = parse_wml_query("[units]/[unit_type]//[damage]/add<0")
+# parsed_query = parse_wml_query("[units]/[unit_type]//[damage]/add<0")
+parsed_query = parse_wml_query("[units]/[unit_type]/[attack]/damage>=33~id,number,damage")
 # parsed_query = parse_wml_query(">>[unit_type]>>add==2")
 # parsed_query = parse_wml_query(">>cost==50")
-# TODO add way to request certain attribute in addition to id as output
 # parsed_query = parse_wml_query("[units]>[unit_type]>movement_type")
 print(parsed_query)
 # print(query_matches(None, ["unit_type", "attack", "specials"], query))
-parsed_query[1][1] = lambda x: x % 3 == 1
+# parsed_query[1][1] = lambda x: x % 3 == 1
 
 if perf():
     import timeit
