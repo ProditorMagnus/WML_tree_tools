@@ -185,6 +185,7 @@ def parse_wml_query(query):
         elif len(item) > 2 and item[0] == "[" and item[-1] == "]":
             path_wanted.append(item[1:-1])
         else:
+            found_operator = False
             for operator in sorted(operators, key=lambda x: len(x[0])):
                 if operator in item:
                     item = item.split(operator, 1)
@@ -193,7 +194,11 @@ def parse_wml_query(query):
                     except:
                         pass
                     attr_wanted = [item[0], lambda x: operators[operator](item[1], x)]
+                    found_operator = True
                     break
+            if not found_operator:
+                if debug(): print("attr check set to True")
+                attr_wanted = (item, lambda x: True)
         if attr_wanted is None:
             attr_wanted = (item, lambda x: True)
     return [path_wanted, attr_wanted, output_keys]
@@ -203,7 +208,10 @@ def parse_wml_query(query):
 # make query list of queries, used as and conditions
 # query = parse_wml_query(">[damage]>add==1")
 # parsed_query = parse_wml_query("[units]/[unit_type]//[damage]/add<0")
-parsed_query = parse_wml_query("[units]/[unit_type]/[attack]/damage>=33~id,number,damage")
+# parsed_query = parse_wml_query("[units]/[unit_type]/[attack]/damage>=33~id,number,damage")
+# parsed_query = parse_wml_query("[units]/[unit_type]/id~id,movement_type")
+# parsed_query = parse_wml_query("//[movetype]/name~name")
+parsed_query = parse_wml_query("[units]/[unit_type]/experience==100~id,experience,level")
 # parsed_query = parse_wml_query(">>[unit_type]>>add==2")
 # parsed_query = parse_wml_query(">>cost==50")
 # parsed_query = parse_wml_query("[units]>[unit_type]>movement_type")
