@@ -7,7 +7,7 @@ from collections import deque
 import wmlparser3
 
 #		 01234567
-mode = 0b01001000  # program settings
+mode = 0b11001000  # program settings
 
 
 # 0: show debug
@@ -118,10 +118,13 @@ def path_invalidates_match(path, query_path, return_exact=False):
     if extra(): print("ended loop with", wanted, actual)
 
     if return_exact:
+        wanted = [i for i in wanted if i != "*"]
         if extra(): print("exact match:", len(actual) == len(wanted) == 0, path, query_path)
+        if star_open:
+            return len(wanted) != 0
         return not (len(actual) == len(wanted) == 0)
 
-    if len(actual) > 0:
+    if len(actual) > 0 and not star_open:
         # we have gone too far inside
         return True
     return False
@@ -179,7 +182,11 @@ def parse_wml_query(query):
 # query made of tag path, ending with single attribute request
 # make query list of queries, used as and conditions
 # query = parse_wml_query(">[damage]>add==1")
-parsed_query = parse_wml_query(">>[unit_type]>>[damage]>add==2")
+parsed_query = parse_wml_query(">>[unit_type]>>[damage]>>add==2")
+# parsed_query = parse_wml_query(">>[unit_type]>>add==2")
+# parsed_query = parse_wml_query(">>cost==50")
+# TODO add way to request certain attribute in addition to id
+# parsed_query = parse_wml_query("[units]>[unit_type]>movement_type")
 print(parsed_query)
 # print(query_matches(None, ["unit_type", "attack", "specials"], query))
 
