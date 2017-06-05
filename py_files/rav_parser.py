@@ -66,20 +66,12 @@ def query_matches(node, path, query):
     if attr_query is not None:
         if node.get_name() != attr_query[0]:
             return False
-        # TODO support other operators to compare, also ranges or lists
         attr_value = node.get_text()
-        attr_wanted = attr_query[1]
-        if attr_value is not None and attr_wanted == "*":
-            return True
-        else:
-            if extra():
-                print("attr check not finished")
-                print("got", attr_value, "wanted", attr_wanted)
-                input()
-            if attr_value != attr_wanted:
-                # print("got",attr_value, "wanted", attr_wanted)
-                return False
-
+        try:
+            attr_value = int(attr_value)
+        except:
+            pass
+        return attr_query[1](attr_value)
     return True
 
 
@@ -151,44 +143,56 @@ def find_from_wml(node, path, query):
         if query_matches(node, path, query):
             printable_ids = [n.get_text_val("id") for n in path]
             if prod(): print("found match at", printable_path, printable_ids)
+            if debug(): print(node.get_name(), node.get_text())
 
 
 def parse_wml_query(query):
+    operators = {
+        "==": lambda x, y: y == x,
+        "!=": lambda x, y: y != x,
+        ">=": lambda x, y: y >= x,
+        ">": lambda x, y: y > x,
+        "<=": lambda x, y: y <= x,
+        "<": lambda x, y: y < x
+    }
+
     path_wanted = []
     attr_wanted = None
-    if query.startswith(">>"):
+    if query.startswith("//"):
         path_wanted.append("*")
         query = query[2:]
-    elif query.startswith(">"):
+    elif query.startswith("/"):
         path_wanted.append("?")
         query = query[1:]
 
-    query = query.split(">")
+    query = query.split("/")
     for item in query:
         if item == "":
             path_wanted.append("*")
         elif len(item) > 2 and item[0] == "[" and item[-1] == "]":
             path_wanted.append(item[1:-1])
         else:
-            # TODO parse attr filter
-            if "==" in item:
-                item = item.split("==", 1)
-                attr_wanted = (item[0], item[1])
-            else:
-                attr_wanted = (item, "*")
-    return path_wanted, attr_wanted
+            for operator in sorted(operators, key=lambda x: len(x[0])):
+                if operator in item:
+                    item = item.split(operator, 1)
+                    attr_wanted = [item[0], lambda x: operators[operator](item[1], x)]
+                    break
+        if attr_wanted is None:
+            attr_wanted = (item, lambda x: True)
+    return [path_wanted, attr_wanted]
 
 
 # query made of tag path, ending with single attribute request
 # make query list of queries, used as and conditions
 # query = parse_wml_query(">[damage]>add==1")
-parsed_query = parse_wml_query(">>[unit_type]>>[damage]>>add==2")
+parsed_query = parse_wml_query("[units]/[unit_type]//[damage]/add<0")
 # parsed_query = parse_wml_query(">>[unit_type]>>add==2")
 # parsed_query = parse_wml_query(">>cost==50")
-# TODO add way to request certain attribute in addition to id
+# TODO add way to request certain attribute in addition to id as output
 # parsed_query = parse_wml_query("[units]>[unit_type]>movement_type")
 print(parsed_query)
 # print(query_matches(None, ["unit_type", "attack", "specials"], query))
+parsed_query[1][1] = lambda x: x % 3 == 1
 
 if perf():
     import timeit
