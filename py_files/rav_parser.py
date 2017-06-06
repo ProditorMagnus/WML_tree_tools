@@ -64,8 +64,11 @@ def query_matches(node, path, query):
         return False
     attr_query = query[1]
     if attr_query is not None:
-        if node.get_name() != attr_query[0]:
+        # TODO add way to ask that attribute does not exist
+        node = node.get_all(att=attr_query[0])
+        if not len(node):
             return False
+        node = node[0]
         attr_value = node.get_text()
         try:
             attr_value = int(attr_value)
@@ -122,40 +125,55 @@ def path_invalidates_match(path, query_path, return_exact=False):
     return False
 
 
-def find_from_wml(node, path, query):
+def find_from_wml(node, path, query_list, output_keys):
     printable_path = [n.get_name() for n in path]
-    if extra(): print("searching", printable_path, query)
-    if path_invalidates_match(path, query[0]):
-        if extra(): print("path invalidates match")
-        return
-    else:
-        if extra(): print("match still possible")
-    if len(path) > len(query[0]) and "*" not in query[0]:
-        # only looked trees of limited depth
-        return
+    if extra(): print("searching", printable_path, query_list)
+    # for each query, check that current path can be what is needed
+    for query in query_list:
+        query_path = query[0]
+        if path_invalidates_match(path, query_path):
+            if extra(): print("path invalidates match")
+            return
+        else:
+            if extra(): print("match still possible")
+        if len(path) > len(query_path) and "*" not in query_path:
+            # only looked trees of limited depth
+            return
     if isinstance(node, wmlparser3.TagNode):
-        for child in node.get_all():
-            if isinstance(child, wmlparser3.TagNode):
-                find_from_wml(child, path + [child], query)
+        # here try to match instead
+        matches = False
+        for query in query_list:
+            if query_matches(node, path, query):
+                matches = True
             else:
-                find_from_wml(child, path, query)
-    elif isinstance(node, wmlparser3.AttributeNode):
-        if query_matches(node, path, query):
+                matches = False
+                break
+
+        if matches:
             printable_ids = []
             for n in path:
                 printable_values = []
-                for output_key in query[2]:
+                for output_key in output_keys:
                     val = n.get_text_val(output_key)
                     if val is not None:
                         printable_values.append((output_key, val))
                 printable_ids.append(printable_values)
 
             if prod(): print("found match at", printable_path, printable_ids)
-            if extra(): print(node.get_name(), node.get_text())
+
+        for child in node.get_all():
+            if isinstance(child, wmlparser3.TagNode):
+                find_from_wml(child, path + [child], query_list, output_keys)
+            else:
+                find_from_wml(child, path, query_list, output_keys)
+    elif isinstance(node, wmlparser3.AttributeNode):
+        # TOO late to try to match here
+        return
 
 
 def parse_wml_query(query):
-    output_keys = "id"
+    # TODO return list of queries, and then output_keys
+    output_keys = ["id"]
     if "~" in query:
         query, output_keys = query.split("~", 1)
         output_keys = output_keys.split(",")
@@ -211,10 +229,11 @@ def parse_wml_query(query):
 # parsed_query = parse_wml_query("[units]/[unit_type]/[attack]/damage>=33~id,number,damage")
 # parsed_query = parse_wml_query("[units]/[unit_type]/id~id,movement_type")
 # parsed_query = parse_wml_query("//[movetype]/name~name")
-parsed_query = parse_wml_query("[units]/[unit_type]/experience==100~id,experience,level")
+# parsed_query = parse_wml_query("[units]/[unit_type]/experience==100~id,experience,level")
 # parsed_query = parse_wml_query(">>[unit_type]>>add==2")
-# parsed_query = parse_wml_query(">>cost==50")
-# parsed_query = parse_wml_query("[units]>[unit_type]>movement_type")
+# parsed_query = parse_wml_query("//id")
+parsed_query = [parse_wml_query("[units]/[unit_type]/hitpoints==53"), parse_wml_query("[units]/[unit_type]/cost==30")]
+output_keys = ["id", "cost", "hitpoints"]
 print(parsed_query)
 # print(query_matches(None, ["unit_type", "attack", "specials"], query))
 # parsed_query[1][1] = lambda x: x % 3 == 1
@@ -223,8 +242,8 @@ if perf():
     import timeit
 
     start_time = timeit.default_timer()
-    find_from_wml(root_node, [], parsed_query)
+    find_from_wml(root_node, [], parsed_query, output_keys)
     elapsed = timeit.default_timer() - start_time
     print(elapsed)  # obsolete
 else:
-    find_from_wml(root_node, [], parsed_query)
+    find_from_wml(root_node, [], parsed_query, output_keys)
