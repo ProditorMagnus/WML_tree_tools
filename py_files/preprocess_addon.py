@@ -1,9 +1,8 @@
 from subprocess import call
 from os.path import join
-import os
 
 wesnoth_dir = r"C:\Users\Ravana\Desktop\general\wesnoth-related\dev1.13.8"
-wesnoth_path = join(wesnoth_dir,"wesnoth.exe")
+wesnoth_path = join(wesnoth_dir,"wesnoth-1.13.8.exe")
 core_path = join(wesnoth_dir,"data")
 
 core_out_path = join("..","core")

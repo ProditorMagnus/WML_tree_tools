@@ -7,7 +7,7 @@ from collections import deque
 import wmlparser3
 
 #		 01234567
-mode = 0b11001000  # program settings
+mode = 0b11000000  # program settings
 
 
 # 0: show debug
@@ -232,8 +232,10 @@ def parse_wml_query(query):
 # parsed_query = parse_wml_query("[units]/[unit_type]/experience==100~id,experience,level")
 # parsed_query = parse_wml_query(">>[unit_type]>>add==2")
 # parsed_query = parse_wml_query("//id")
-parsed_query = [parse_wml_query("[units]/[unit_type]/hitpoints==53"), parse_wml_query("[units]/[unit_type]/cost==30")]
-output_keys = ["id", "cost", "hitpoints"]
+# parsed_query = [parse_wml_query("[units]/[unit_type]/hitpoints==53"), parse_wml_query("[units]/[unit_type]/cost==30")]
+parsed_query = [parse_wml_query("[units]/[unit_type]/level==1")]
+# output_keys = ["id", "cost", "hitpoints"]
+output_keys = ["id", "level"]
 print(parsed_query)
 # print(query_matches(None, ["unit_type", "attack", "specials"], query))
 # parsed_query[1][1] = lambda x: x % 3 == 1
