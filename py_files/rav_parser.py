@@ -7,7 +7,7 @@ from collections import deque
 import wmlparser3
 
 #		 01234567
-mode = 0b11000000  # program settings
+mode = 0b11001000  # program settings
 
 
 # 0: show debug
@@ -59,8 +59,8 @@ else:
             pickle.dump(root_node, f)
 
 
-def query_matches(node, path, query):
-    if path_invalidates_match(path, query[0], True):
+def query_matches(node, path, query, exact=True):
+    if path_invalidates_match(path, query[0], exact):
         return False
     attr_query = query[1]
     if attr_query is not None:
@@ -139,15 +139,25 @@ def find_from_wml(node, path, query_list, output_keys):
         if len(path) > len(query_path) and "*" not in query_path:
             # only looked trees of limited depth
             return
+        break  ### TODO think if should be checked for others
     if isinstance(node, wmlparser3.TagNode):
         # here try to match instead
+        # check if something is allowed to come after node with attribute
         matches = False
         for query in query_list:
             if query_matches(node, path, query):
                 matches = True
             else:
-                matches = False
-                break
+                lesser_matches = False
+                if matches:
+                    # try if it matches with less path
+                    for i in range(len(path)):
+                        if query_matches(path[i], path[:i], query, False):
+                            lesser_matches = True
+                            break
+                if not lesser_matches:
+                    matches = False
+                    break
 
         if matches:
             printable_ids = []
@@ -232,10 +242,14 @@ def parse_wml_query(query):
 # parsed_query = parse_wml_query("[units]/[unit_type]/experience==100~id,experience,level")
 # parsed_query = parse_wml_query(">>[unit_type]>>add==2")
 # parsed_query = parse_wml_query("//id")
-# parsed_query = [parse_wml_query("[units]/[unit_type]/hitpoints==53"), parse_wml_query("[units]/[unit_type]/cost==30")]
-parsed_query = [parse_wml_query("[units]/[unit_type]/level==1")]
-# output_keys = ["id", "cost", "hitpoints"]
-output_keys = ["id", "level"]
+parsed_query = [parse_wml_query("[units]/[unit_type]/[attack]/damage>15"),
+                parse_wml_query("[units]/[unit_type]/hitpoints==70")]
+# parsed_query = [parse_wml_query("[units]/[unit_type]/level==1")]
+output_keys = ["id", "cost", "hitpoints"]
+# output_keys = ["id"]
+# When generating lists, replace
+# .*?'(AE_[A-Za-z_0-9]+)'
+# "\1",
 print(parsed_query)
 # print(query_matches(None, ["unit_type", "attack", "specials"], query))
 # parsed_query[1][1] = lambda x: x % 3 == 1
