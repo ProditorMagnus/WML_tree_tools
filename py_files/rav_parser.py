@@ -64,12 +64,17 @@ def query_matches(node, path, query, exact=True):
         return False
     attr_query = query[1]
     if attr_query is not None:
-        # TODO add way to ask that attribute does not exist
-        node = node.get_all(att=attr_query[0])
-        if not len(node):
+        attr_node = node.get_all(att=attr_query[0])
+        if not len(attr_node):
+            # if no such attribute, check if this was wanted
+            # TODO when node is tagnode not attr anymore, might need to use +[node] for all places where is path_invalidates_match
+            if attr_query[1](None) and not path_invalidates_match(path + [node], query[0], True):
+                if extra(): print("path invalidate match when no attr", path_invalidates_match(path, query[0], True))
+                if extra(): print("query matches for attr not existing", [n.get_name() for n in path], attr_node)
+                return True
             return False
-        node = node[0]
-        attr_value = node.get_text()
+        attr_node = attr_node[0]
+        attr_value = attr_node.get_text()
         try:
             attr_value = int(attr_value)
         except:
@@ -194,7 +199,8 @@ def parse_wml_query(query):
         ">=": lambda x, y: y >= x,
         ">": lambda x, y: y > x,
         "<=": lambda x, y: y <= x,
-        "<": lambda x, y: y < x
+        "<": lambda x, y: y < x,
+        "!": lambda x, y: y is None
     }
 
     path_wanted = []
@@ -225,8 +231,8 @@ def parse_wml_query(query):
                     found_operator = True
                     break
             if not found_operator:
-                if debug(): print("attr check set to True")
-                attr_wanted = (item, lambda x: True)
+                if debug(): print("attr check set to not None")
+                attr_wanted = (item, lambda x: x is not None)
         if attr_wanted is None:
             attr_wanted = (item, lambda x: True)
     return [path_wanted, attr_wanted, output_keys]
@@ -242,10 +248,10 @@ def parse_wml_query(query):
 # parsed_query = parse_wml_query("[units]/[unit_type]/experience==100~id,experience,level")
 # parsed_query = parse_wml_query(">>[unit_type]>>add==2")
 # parsed_query = parse_wml_query("//id")
-parsed_query = [parse_wml_query("[units]/[unit_type]/[attack]/damage>15"),
-                parse_wml_query("[units]/[unit_type]/hitpoints==70")]
-# parsed_query = [parse_wml_query("[units]/[unit_type]/level==1")]
+parsed_query = [parse_wml_query("[units]/[unit_type]/[base_unit]/id"),
+                parse_wml_query("[units]/[unit_type]/hitpoints!")]
 output_keys = ["id", "cost", "hitpoints"]
+# parsed_query = [parse_wml_query("[units]/[unit_type]/level==1")]
 # output_keys = ["id"]
 # When generating lists, replace
 # .*?'(AE_[A-Za-z_0-9]+)'
