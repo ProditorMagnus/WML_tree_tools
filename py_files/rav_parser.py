@@ -68,8 +68,10 @@ def query_matches(node, path, query, exact=True):
         if not len(attr_node):
             # if no such attribute, check if this was wanted
             # TODO when node is tagnode not attr anymore, might need to use +[node] for all places where is path_invalidates_match
-            if attr_query[1](None) and not path_invalidates_match(path + [node], query[0], True):
-                if extra(): print("path invalidate match when no attr", path_invalidates_match(path, query[0], True))
+            # TODO  + [node] breaks checking if event id does not exist, but removing it breaks if attribute does not exist check on lower level
+            if attr_query[1](None) and not path_invalidates_match(path, query[0], True):
+                if extra(): print("path invalidate match when no attr",
+                                  path_invalidates_match(path + [node], query[0], True))
                 if extra(): print("query matches for attr not existing", [n.get_name() for n in path], attr_node)
                 return True
             return False
@@ -248,9 +250,11 @@ def parse_wml_query(query):
 # parsed_query = parse_wml_query("[units]/[unit_type]/experience==100~id,experience,level")
 # parsed_query = parse_wml_query(">>[unit_type]>>add==2")
 # parsed_query = parse_wml_query("//id")
-parsed_query = [parse_wml_query("[units]/[unit_type]/[base_unit]/id"),
-                parse_wml_query("[units]/[unit_type]/hitpoints!")]
-output_keys = ["id", "cost", "hitpoints"]
+# parsed_query = [parse_wml_query("[units]/[unit_type]/[base_unit]/id"),
+#                 parse_wml_query("[units]/[unit_type]/hitpoints!")]
+# output_keys = ["id", "cost", "hitpoints"]
+parsed_query = [parse_wml_query("[units]/[unit_type]/[event]/id!")]
+output_keys = ["id", "name", "first_time_only"]
 # parsed_query = [parse_wml_query("[units]/[unit_type]/level==1")]
 # output_keys = ["id"]
 # When generating lists, replace
