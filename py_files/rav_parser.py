@@ -42,21 +42,23 @@ def perf():
     return mode & 0b00000100
 
 
-if not cache():
-    from subprocess import call
+def load_root_node():
+    if not cache():
+        from subprocess import call
 
-    call(["python", "preprocess_addon.py"])
-    main = wmlparser3.Parser()
-    root_node = main.parse_file(join("..", "preprocessed_addon", "_main.cfg"))
-else:
-    if isfile("node_cache.pickle"):
-        with open("node_cache.pickle", "rb") as f:
-            root_node = pickle.load(f)
-    else:
+        call(["python", "preprocess_addon.py"])
         main = wmlparser3.Parser()
         root_node = main.parse_file(join("..", "preprocessed_addon", "_main.cfg"))
-        with open("node_cache.pickle", "wb") as f:
-            pickle.dump(root_node, f)
+    else:
+        if isfile("node_cache.pickle"):
+            with open("node_cache.pickle", "rb") as f:
+                root_node = pickle.load(f)
+        else:
+            main = wmlparser3.Parser()
+            root_node = main.parse_file(join("..", "preprocessed_addon", "_main.cfg"))
+            with open("node_cache.pickle", "wb") as f:
+                pickle.dump(root_node, f)
+    return root_node
 
 
 def query_matches(node, path, query, exact=True):
@@ -69,12 +71,15 @@ def query_matches(node, path, query, exact=True):
             # if no such attribute, check if this was wanted
             # TODO when node is tagnode not attr anymore, might need to use +[node] for all places where is path_invalidates_match
             # TODO  + [node] breaks checking if event id does not exist, but removing it breaks if attribute does not exist check on lower level
-            if attr_query[1](None) and not path_invalidates_match(path, query[0], True):
-                if extra(): print("path invalidate match when no attr",
-                                  path_invalidates_match(path + [node], query[0], True))
-                if extra(): print("query matches for attr not existing", [n.get_name() for n in path], attr_node)
-                return True
-            return False
+            try:
+                if attr_query[1](None) and not path_invalidates_match(path, query[0], True):
+                    if extra(): print("path invalidate match when no attr",
+                                      path_invalidates_match(path + [node], query[0], True))
+                    if extra(): print("query matches for attr not existing", [n.get_name() for n in path], attr_node)
+                    return True
+                return False
+            except:
+                return False
         attr_node = attr_node[0]
         attr_value = attr_node.get_text()
         try:
@@ -132,7 +137,7 @@ def path_invalidates_match(path, query_path, return_exact=False):
     return False
 
 
-def find_from_wml(node, path, query_list, output_keys):
+def find_from_wml(node, path, query_list, output_keys, callable_function):
     printable_path = [n.get_name() for n in path]
     if extra(): print("searching", printable_path, query_list)
     # for each query, check that current path can be what is needed
@@ -176,13 +181,13 @@ def find_from_wml(node, path, query_list, output_keys):
                         printable_values.append((output_key, val))
                 printable_ids.append(printable_values)
 
-            if prod(): print("found match at", printable_path, printable_ids)
+            if prod(): callable_function("found match at", printable_path, printable_ids)
 
         for child in node.get_all():
             if isinstance(child, wmlparser3.TagNode):
-                find_from_wml(child, path + [child], query_list, output_keys)
+                find_from_wml(child, path + [child], query_list, output_keys, callable_function)
             else:
-                find_from_wml(child, path, query_list, output_keys)
+                find_from_wml(child, path, query_list, output_keys, callable_function)
     elif isinstance(node, wmlparser3.AttributeNode):
         # TOO late to try to match here
         return
@@ -250,26 +255,32 @@ def parse_wml_query(query):
 # parsed_query = parse_wml_query("[units]/[unit_type]/experience==100~id,experience,level")
 # parsed_query = parse_wml_query(">>[unit_type]>>add==2")
 # parsed_query = parse_wml_query("//id")
-# parsed_query = [parse_wml_query("[units]/[unit_type]/[base_unit]/id"),
-#                 parse_wml_query("[units]/[unit_type]/hitpoints!")]
+# parsed_query = [parse_wml_query("[units]/[unit_type]/level==1"),
+#                 parse_wml_query("[units]/[unit_type]/hitpoints>=45")]
 # output_keys = ["id", "cost", "hitpoints"]
-parsed_query = [parse_wml_query("[units]/[unit_type]/[event]/id!")]
-output_keys = ["id", "name", "first_time_only"]
+# parsed_query = [parse_wml_query("[units]/[unit_type]/[event]/id!")]
+# output_keys = ["id", "name", "first_time_only"]
 # parsed_query = [parse_wml_query("[units]/[unit_type]/level==1")]
 # output_keys = ["id"]
 # When generating lists, replace
 # .*?'(AE_[A-Za-z_0-9]+)'
 # "\1",
-print(parsed_query)
+
 # print(query_matches(None, ["unit_type", "attack", "specials"], query))
 # parsed_query[1][1] = lambda x: x % 3 == 1
 
-if perf():
-    import timeit
+if __name__ == '__main__':
+    parsed_query = [parse_wml_query("[units]/[unit_type]/level==0")]
+    output_keys = ["id"]
+    print(parsed_query)
 
-    start_time = timeit.default_timer()
-    find_from_wml(root_node, [], parsed_query, output_keys)
-    elapsed = timeit.default_timer() - start_time
-    print(elapsed)  # obsolete
-else:
-    find_from_wml(root_node, [], parsed_query, output_keys)
+    root_node = load_root_node()
+    if perf():
+        import timeit
+
+        start_time = timeit.default_timer()
+        find_from_wml(root_node, [], parsed_query, output_keys, print)
+        elapsed = timeit.default_timer() - start_time
+        print(elapsed)  # obsolete
+    else:
+        find_from_wml(root_node, [], parsed_query, output_keys, print)
