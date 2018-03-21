@@ -7,7 +7,7 @@ from collections import deque
 import wmlparser3
 
 #		 01234567
-mode = 0b11001000  # program settings
+mode = 0b01001000  # program settings
 
 
 # 0: show debug
@@ -40,6 +40,12 @@ def cache():
 
 def perf():
     return mode & 0b00000100
+
+
+def parse_root_node(path):
+    main = wmlparser3.Parser()
+    root_node = main.parse_file(path)
+    return root_node
 
 
 def load_root_node():
@@ -175,10 +181,16 @@ def find_from_wml(node, path, query_list, output_keys, callable_function):
             printable_ids = []
             for n in path:
                 printable_values = []
-                for output_key in output_keys:
-                    val = n.get_text_val(output_key)
-                    if val is not None:
-                        printable_values.append((output_key, val))
+                if "*" in output_keys:
+                    for attr in n.get_all(att=""):
+                        val = attr.get_text()
+                        if val is not None:
+                            printable_values.append((attr.get_name(), val))
+                else:
+                    for output_key in output_keys:
+                        val = n.get_text_val(output_key)
+                        if val is not None:
+                            printable_values.append((output_key, val))
                 printable_ids.append(printable_values)
 
             if prod(): callable_function("found match at", printable_path, printable_ids)

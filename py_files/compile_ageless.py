@@ -1,7 +1,10 @@
 from subprocess import call
 from os.path import join
 
-version = "1.13"
+versions = ["1.13", "1.12", "ghype"]
+version = "ghype"
+assert version in versions
+
 if version == "1.13":
     wesnoth_dir = r"C:\Users\Ravana\Desktop\general\wesnoth-related\dev1.13.11"
     wesnoth_path = join(wesnoth_dir, "wesnoth1_13_11.exe")
@@ -9,6 +12,13 @@ if version == "1.13":
     input_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.13\data\add-ons\Ageless_Era"
     addon_out_path = join("..", "preprocessed_addon_13")
     core_out_path = join("..", "core_13")
+elif version == "ghype":
+    wesnoth_dir = r"C:\Users\Ravana\Desktop\general\wesnoth-related\stable1.12.5copy"
+    wesnoth_path = join(wesnoth_dir, "wesnoth-1.12.5stablecopy.exe")
+    userdata_path = r"C:\Users\Ravana\Desktop\general\wesnoth-related\stable1.12.5copy\userdata"
+    input_path = r"C:\Users\Ravana\Desktop\general\wesnoth-related\stable1.12.5copy\userdata\data\add-ons\Ageless_Era"
+    addon_out_path = join("..", "preprocessed_addon_ghype")
+    core_out_path = join("..", "core_ghype")
 else:
     wesnoth_dir = r"C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6"
     wesnoth_path = join(wesnoth_dir, "wesnoth-mydev.exe")
