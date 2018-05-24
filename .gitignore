@@ -3,8 +3,7 @@ nppBackup
 ignored
 __pycache__
 _main.cfg.plain
-preprocessed_addon
-unprocessed_addon
-core
 *.pickle
 .idea
+core*/
+preprocessed_addon*/

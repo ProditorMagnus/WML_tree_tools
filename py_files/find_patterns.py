@@ -1,7 +1,9 @@
 from os.path import join
 import rav_parser
+from typing import List, Tuple
 
-addon_version = "preprocessed_addon_ghype"
+# addon_version = "preprocessed_addon_ghype"
+addon_version = "preprocessed_addon"
 root_node = rav_parser.parse_root_node(join("..", addon_version, "_main.cfg"))
 
 
@@ -66,5 +68,28 @@ def check_movetype_names():
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, movetype_missing_function)
 
 
-check_damage_types()
-check_movetype_names()
+# check_damage_types()
+# check_movetype_names()
+
+
+def find_id_without_prefix():
+    unprefixed_ids = set()
+    common_ids = ["leadership", "submerge", "nightstalk", "regenerates", "skirmisher", "feeding", "illumination",
+                  "steadfast", "teleport", "ambush", "healing", "concealment", "curing"]
+
+    def on_id(description, path, attributes: List[List[Tuple[str, str]]]):
+        for path_attributes in attributes:
+            for key, value in path_attributes:
+                if key == "id":
+                    if not value.startswith("AE_"):
+                        if value not in common_ids:
+                            print(value, path, attributes)
+                            unprefixed_ids.add(value)
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[abilities]/[?]")]
+    output_keys = ["id"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
+    print(unprefixed_ids)
+
+
+find_id_without_prefix()
