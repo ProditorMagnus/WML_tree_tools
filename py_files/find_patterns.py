@@ -3,7 +3,7 @@ import rav_parser
 from typing import List, Tuple
 
 # addon_version = "preprocessed_addon_ghype"
-addon_version = "preprocessed_addon"
+addon_version = "preprocessed_addon_14"
 root_node = rav_parser.parse_root_node(join("..", addon_version, "_main.cfg"))
 
 
@@ -68,10 +68,6 @@ def check_movetype_names():
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, movetype_missing_function)
 
 
-# check_damage_types()
-# check_movetype_names()
-
-
 def find_id_without_prefix():
     unprefixed_ids = set()
     common_ids = ["leadership", "submerge", "nightstalk", "regenerates", "skirmisher", "feeding", "illumination",
@@ -92,4 +88,69 @@ def find_id_without_prefix():
     print(unprefixed_ids)
 
 
-find_id_without_prefix()
+def check_duplicate_abilities():
+    units_with_ability = set()
+    units_with_multiple_abilities = set()
+
+    def on_id(description, path, attributes: List[List[Tuple[str, str]]]):
+        for path_attributes in attributes:
+            for key, value in path_attributes:
+                if key != "id":
+                    continue
+                if value in units_with_ability:
+                    units_with_multiple_abilities.add(value)
+                units_with_ability.add(value)
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[abilities]")]
+    output_keys = ["id"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
+    print("Duplicate abilities", units_with_multiple_abilities)
+
+
+def check_duplicate_resists():
+    units_with_resist = set()
+    units_with_multiple_resists = set()
+
+    def on_id(description, path, attributes: List[List[Tuple[str, str]]]):
+        for path_attributes in attributes:
+            for key, value in path_attributes:
+                if key != "id":
+                    continue
+                if value in units_with_resist:
+                    units_with_multiple_resists.add(value)
+                units_with_resist.add(value)
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[resistance]")]
+    output_keys = ["id"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
+    print("Duplicate resistance", units_with_multiple_resists)
+
+
+def check_duplicate_defense():
+    units_with_tag = set()
+    units_with_multiple_tags = set()
+
+    def on_id(description, path, attributes: List[List[Tuple[str, str]]]):
+        for path_attributes in attributes:
+            for key, value in path_attributes:
+                if key != "id":
+                    continue
+                if value in units_with_tag:
+                    units_with_multiple_tags.add(value)
+                units_with_tag.add(value)
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[defense]")]
+    output_keys = ["id"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
+    print("Duplicate defense", units_with_multiple_tags)
+
+
+check_duplicate_abilities()
+check_duplicate_resists()
+check_duplicate_defense()
+
+
+def check_all():
+    check_damage_types()
+    check_movetype_names()
+    find_id_without_prefix()
