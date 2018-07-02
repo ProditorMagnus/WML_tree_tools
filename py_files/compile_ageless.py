@@ -1,44 +1,36 @@
 from subprocess import call
-from os.path import join
+from os.path import join, expanduser
 
-versions = ["1.14", "1.13", "1.12", "ghype"]
+versions = ["1.14"]
 version = "1.14"
 assert version in versions
 
-if version == "1.14":
-    wesnoth_dir = r"C:\Users\Ravana\Desktop\general\wesnoth-related\stable1.14.0"
-    wesnoth_path = join(wesnoth_dir, "wesnoth.exe")
-    userdata_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.14"
-    input_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.14\data\add-ons\Ageless_Era"
-    addon_out_path = join("..", "preprocessed_addon_14")
-    core_out_path = join("..", "core_14")
-elif version == "1.13":
-    wesnoth_dir = r"C:\Users\Ravana\Desktop\general\wesnoth-related\dev1.13.11"
-    wesnoth_path = join(wesnoth_dir, "wesnoth1_13_11.exe")
-    userdata_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.13"
-    input_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.13\data\add-ons\Ageless_Era"
-    addon_out_path = join("..", "preprocessed_addon_13")
-    core_out_path = join("..", "core_13")
-elif version == "ghype":
-    wesnoth_dir = r"C:\Users\Ravana\Desktop\general\wesnoth-related\stable1.12.5copy"
-    wesnoth_path = join(wesnoth_dir, "wesnoth-1.12.5stablecopy.exe")
-    userdata_path = r"C:\Users\Ravana\Desktop\general\wesnoth-related\stable1.12.5copy\userdata"
-    input_path = r"C:\Users\Ravana\Desktop\general\wesnoth-related\stable1.12.5copy\userdata\data\add-ons\Ageless_Era"
-    addon_out_path = join("..", "preprocessed_addon_ghype")
-    core_out_path = join("..", "core_ghype")
-else:
-    wesnoth_dir = r"C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6"
-    wesnoth_path = join(wesnoth_dir, "wesnoth-mydev.exe")
-    userdata_path = r"C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6\userdata"
-    input_path = r"C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6\userdata\data\add-ons\Ageless_Era"
-    addon_out_path = join("..", "preprocessed_addon")
-    core_out_path = join("..", "core")
-core_path = join(wesnoth_dir, "data")
+# if version == "1.14":
+wesnoth_dir = r"~/wesnoth/wesnoth-lobby"
+wesnoth_exe = r"~/wesnoth/wesnoth-lobby/wesnoth"
+userdata_path = r"~/wesnoth/userdata_1_14"
+input_path = r"~/wesnoth/userdata_1_14/data/add-ons/Ageless_Era"
+addon_out_path = join("..", "preprocessed_addon")
+core_out_path = join("..", "core")
+
+core_path = expanduser(join(wesnoth_dir, "data"))
+
+wesnoth_dir = expanduser(wesnoth_dir)
+wesnoth_exe = expanduser(wesnoth_exe)
+userdata_path = expanduser(userdata_path)
+input_path = expanduser(input_path)
+addon_out_path = expanduser(addon_out_path)
+core_out_path = expanduser(core_out_path)
 
 preprocess_defines = "MULTIPLAYER,SKIP_CORE"
-call([wesnoth_path, "--data-dir", wesnoth_dir, "--preprocess-defines", preprocess_defines, "-p", core_path,
+call([wesnoth_exe, "--data-dir", wesnoth_dir, "--preprocess-defines", preprocess_defines, "-p", core_path,
       core_out_path, "--preprocess-output-macros"])
 
-call([wesnoth_path, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
+call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
       preprocess_defines, "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path,
       addon_out_path])
+
+# preprocess_defines = "MULTIPLAYER"
+# call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
+#       preprocess_defines, "-p", input_path,
+#       addon_out_path])
