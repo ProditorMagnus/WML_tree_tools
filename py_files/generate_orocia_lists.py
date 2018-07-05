@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from os.path import join
 
 import rav_parser
@@ -34,6 +35,7 @@ AE_arc_khthon_Adamantine_Hiding
 AE_mag_Runemaster_Protected
 AE_mag_Goblin_Kamikaze
 AE_mrc_fanatics_Martyr
+AE_efm_imperialists_Sapper
 """.split())
 
 
@@ -52,7 +54,7 @@ def result_function(description, path, attributes):
     write(current_level, '\t"{}",\n'.format(unit_id))
 
 
-addon_version = "preprocessed_addon_14"
+addon_version = "preprocessed_addon"
 root_node = rav_parser.parse_root_node(join("..", addon_version, "_main.cfg"))
 
 for current_level, var_name in [(0, "ORM.unit.level_zero"), (1, "ORM.unit.level_one"), (2, "ORM.unit.level_two"),

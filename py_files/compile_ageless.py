@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from subprocess import call
 from os.path import join, expanduser
 
@@ -30,7 +31,3 @@ call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "
       preprocess_defines, "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path,
       addon_out_path])
 
-# preprocess_defines = "MULTIPLAYER"
-# call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
-#       preprocess_defines, "-p", input_path,
-#       addon_out_path])

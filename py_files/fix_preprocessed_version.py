@@ -1,8 +1,9 @@
+#!/usr/bin/python3
 from os.path import join
 import re
 
-main_path = join("..", "preprocessed_addon_14", "_main.cfg")
-out_path = join("..", "preprocessed_addon_14", "ageless_4_20.preprocessed.cfg")
+main_path = join("..", "preprocessed_addon", "_main.cfg")
+out_path = join("..", "preprocessed_addon", "ageless_4_21.preprocessed.cfg")
 
 with open(main_path, encoding="utf8") as f:
     with open(out_path, "w", encoding="utf8") as g:

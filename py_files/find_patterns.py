@@ -5,7 +5,7 @@ from typing import List, Tuple
 Attribute = Tuple[str, str]
 Attributes = List[Attribute]
 
-addon_version = "preprocessed_addon_14"
+addon_version = "preprocessed_addon"
 root_node = rav_parser.parse_root_node(join("..", addon_version, "_main.cfg"))
 
 

@@ -7,3 +7,4 @@ _main.cfg.plain
 .idea
 core*/
 preprocessed_addon*/
+data_generated_units.lua
