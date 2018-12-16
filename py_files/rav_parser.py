@@ -194,6 +194,7 @@ def find_from_wml(node, path, query_list, output_keys, callable_function):
                 printable_ids.append(printable_values)
 
             if prod(): callable_function("found match at", printable_path, printable_ids)
+            # TODO dict not list of tuples
 
         for child in node.get_all():
             if isinstance(child, wmlparser3.TagNode):

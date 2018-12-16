@@ -6,11 +6,17 @@ versions = ["1.14"]
 version = "1.14"
 assert version in versions
 
-# if version == "1.14":
-wesnoth_dir = r"~/wesnoth/wesnoth-lobby"
-wesnoth_exe = r"~/wesnoth/wesnoth-lobby/wesnoth"
-userdata_path = r"~/wesnoth/userdata_1_14"
-input_path = r"~/wesnoth/userdata_1_14/data/add-ons/Ageless_Era"
+OS = "windows"
+if OS == "windows":
+    wesnoth_dir = r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth"
+    wesnoth_exe = r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth\wesnoth.exe"
+    userdata_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.14"
+    input_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.14\data\add-ons\Ageless_Era"
+else:
+    wesnoth_dir = r"~/wesnoth/wesnoth-lobby"
+    wesnoth_exe = r"~/wesnoth/wesnoth-lobby/wesnoth"
+    userdata_path = r"~/wesnoth/userdata_1_14"
+    input_path = r"~/wesnoth/userdata_1_14/data/add-ons/Ageless_Era"
 addon_out_path = join("..", "preprocessed_addon")
 core_out_path = join("..", "core")
 
@@ -30,4 +36,3 @@ call([wesnoth_exe, "--data-dir", wesnoth_dir, "--preprocess-defines", preprocess
 call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
       preprocess_defines, "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path,
       addon_out_path])
-
