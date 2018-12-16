@@ -112,7 +112,7 @@ class AttributeNode:
             s += v.wml().replace(b"\"", b"\"\"")
         s += b"\""
         return s
-    
+
     def debug(self):
         return self.name.decode("utf8") + "=" + " .. ".join(
             [v.debug() for v in self.value])
@@ -172,7 +172,7 @@ class TagNode:
         s = b"[" + self.name + b"]\n"
         for sub in self.data:
             s += sub.wml() + b"\n"
-        s += b"[/" + self.name + b"]\n"
+        s += b"[/" + self.name.lstrip(b'+') + b"]\n"
         return s
 
     def debug(self):
@@ -180,7 +180,7 @@ class TagNode:
         for sub in self.data:
             for subline in sub.debug().splitlines():
                 s += "    %s\n" % subline
-        s += "[/%s]\n" % self.name.decode("utf8")
+        s += "[/%s]\n" % self.name.decode("utf8").lstrip('+')
         return s
 
     def get_all(self, **kw):
@@ -309,7 +309,7 @@ class Parser:
         if data_dir: self.data_dir = os.path.abspath(data_dir)
         self.keep_temp_dir = None
         self.temp_dir = None
-        self.no_preprocess = (wesnoth_exe == None)
+        self.no_preprocess = (wesnoth_exe is None)
         self.preprocessed = None
         self.verbose = False
 
@@ -357,7 +357,7 @@ class Parser:
         else:
             output = tempfile.mkdtemp(prefix="wmlparser_")
             tempdirs_to_clean.append(output)
-            
+
         self.temp_dir = output
         commandline = [self.wesnoth_exe]
         if self.data_dir:
@@ -506,6 +506,9 @@ class Parser:
         self.in_tag = b""
         if tag.startswith(b"/"):
             self.parent_node = self.parent_node[:-1]
+        elif tag.startswith(b"+") and self.parent_node and self.parent_node[-1].get_all(tag = tag[1:].decode()):
+            node_to_append_to = self.parent_node[-1].get_all(tag = tag[1:].decode())[-1]
+            self.parent_node.append(node_to_append_to)
         else:
             node = TagNode(tag, location=(self.line_in_file, self.chunk_start))
             if self.parent_node:
@@ -645,7 +648,7 @@ def xmlify(tree, verbose=False, depth=0):
         for tag in n.get_all(tag = ""):
             et.append(node_to_et(tag))
         return et
-    
+
     ET.ElementTree(node_to_et(tree.get_all()[0])).write(
         sys.stdout, encoding = "unicode")
 
@@ -717,6 +720,66 @@ a=1
     a='1'
 [/test]
 """, "simple")
+
+        test(
+"""
+[+foo]
+a=1
+[/foo]
+""", """
+[+foo]
+    a='1'
+[/foo]
+""", "+foo without foo in toplevel")
+
+        test(
+"""
+[foo]
+[+bar]
+a=1
+[/bar]
+[/foo]
+""", """
+[foo]
+    [+bar]
+        a='1'
+    [/bar]
+[/foo]
+""", "+foo without foo in child")
+
+        test(
+"""
+[test]
+[foo]
+a=1
+[/foo]
+[/test]
+""", """
+[test]
+    [foo]
+        a='1'
+    [/foo]
+[/test]
+""", "subtag, part 1")
+
+        test(
+"""
+[test]
+[foo]
+a=1
+[/foo]
+[/test]
+[+test]
+[+foo]
+[/foo]
+[/test]
+""", """
+[test]
+    [foo]
+        a='1'
+    [/foo]
+[/test]
+""", "subtag, part 2")
 
         test(
 """
