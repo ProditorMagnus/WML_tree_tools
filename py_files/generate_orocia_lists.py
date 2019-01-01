@@ -36,6 +36,7 @@ AE_mag_Runemaster_Protected
 AE_mag_Goblin_Kamikaze
 AE_mrc_fanatics_Martyr
 AE_efm_imperialists_Sapper
+AE_mag_bug_3827
 """.split())
 
 
