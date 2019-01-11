@@ -5,8 +5,8 @@ from typing import List, Tuple
 Attribute = Tuple[str, str]
 Attributes = List[Attribute]
 
-addon_version = "preprocessed_addon"
-root_node = rav_parser.parse_root_node(join("..", addon_version, "_main.cfg"))
+addonId = "Ageless_Era"
+root_node = rav_parser.parse_root_node(join("..", "preprocessed_addon", addonId, "_main.cfg"))
 
 
 def check_damage_types():

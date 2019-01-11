@@ -30,8 +30,8 @@ def add_all(value, var):
             var.add(unit)
 
 
-addon_version = "preprocessed_addon"
-root_node = rav_parser.parse_root_node(join("..", addon_version, "_main.cfg"))
+addonId = "Ageless_Era"
+root_node = rav_parser.parse_root_node(join("..", "preprocessed_addon", addonId, "_main.cfg"))
 
 parsed_query = [rav_parser.parse_wml_query("[era]/[multiplayer_side]")]
 output_keys = ["id", "leader", "random_leader", "recruit"]

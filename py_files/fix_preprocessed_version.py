@@ -2,7 +2,7 @@
 from os.path import join
 import re
 
-main_path = join("..", "preprocessed_addon", "_main.cfg")
+main_path = join("..", "preprocessed_addon", "Ageless_Era", "_main.cfg")
 out_path = join("..", "preprocessed_addon", "ageless_4_22.preprocessed.cfg")
 
 with open(main_path, encoding="utf8") as f:
