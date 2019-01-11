@@ -8,12 +8,14 @@ version = "1.14"
 assert version in versions
 
 
-def printNewLogFiles(log_path, log_files):
-    log_files = set(os.listdir(log_path)).difference(log_files)
+def printNewLogFiles(log_path, old_log_files):
+    new_log_files = os.listdir(log_path)
+    log_files = set(new_log_files).difference(old_log_files)
     for file in log_files:
         with open(join(log_path, file)) as f:
             print()
             print(f.read())
+    return old_log_files.union(new_log_files)
 
 
 def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE", OS="windows"):
@@ -47,13 +49,13 @@ def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE", OS="wi
     call([wesnoth_exe, "--data-dir", wesnoth_dir, "--preprocess-defines", preprocess_defines, "-p", core_path,
           core_out_path, "--preprocess-output-macros"])
     if isWindows():
-        printNewLogFiles(log_path, log_files)
+        log_files = printNewLogFiles(log_path, log_files)
 
     call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
           preprocess_defines, "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path,
           addon_out_path])
     if isWindows():
-        printNewLogFiles(log_path, log_files)
+        log_files = printNewLogFiles(log_path, log_files)
 
 
 if __name__ == '__main__':
