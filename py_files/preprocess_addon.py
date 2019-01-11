@@ -1,33 +1,62 @@
+#!/usr/bin/python3
+import os
 from subprocess import call
-from os.path import join
+from os.path import join, expanduser
 
-wesnoth_dir = r"C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6"
-wesnoth_path = join(wesnoth_dir,"wesnoth-mydev.exe")
-core_path = join(wesnoth_dir,"data")
+versions = ["1.14"]
+version = "1.14"
+assert version in versions
 
-core_out_path = join("..","core")
 
-# it must be in actual userdata
-userdata_path = r"C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6\userdata"
-input_path = r"C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6\userdata\data\add-ons\Ageless_Era"
-addon_out_path = join("..","preprocessed_addon")
+def printNewLogFiles(log_path, old_log_files):
+    new_log_files = os.listdir(log_path)
+    log_files = set(new_log_files).difference(old_log_files)
+    for file in log_files:
+        with open(join(log_path, file)) as f:
+            print()
+            print(f.read())
+    return old_log_files.union(new_log_files)
 
-# Something breaks when calling it from script
-working_core = r"""C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6>wesnoth-mydev.exe --
-preprocess-defines MULTIPLAYER,SKIP_CORE -p "C:\Users\Ravana\Desktop\general\wes
-noth-related\mydev1.12.6\data" "C:\Users\Ravana\Desktop\general\wesnoth-related\
-dev1.13.8\WML_tree_tools\core" --preprocess-output-macros
-"""
-# print(" ".join([wesnoth_path, "--preprocess-defines", "MULTIPLAYER,SKIP_CORE", "-p", core_path, core_out_path, "--preprocess-output-macros"]))
-call([wesnoth_path, "--data-dir", wesnoth_dir, "--preprocess-defines", "MULTIPLAYER,SKIP_CORE", "-p", core_path, core_out_path, "--preprocess-output-macros"])
 
-working_addon = r"""C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6>wesnoth-mydev.exe --
-userdata-dir "C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6\userda
-ta" --preprocess-defines MULTIPLAYER,SKIP_CORE --preprocess-input-macros "C:\Use
-rs\Ravana\Desktop\general\wesnoth-related\dev1.13.8\WML_tree_tools\core\_MACROS_
-.cfg" -p "C:\Users\Ravana\Desktop\general\wesnoth-related\mydev1.12.6\userdata\d
-ata\add-ons\Ageless_Era" "C:\Users\Ravana\Desktop\general\wesnoth-related\dev1.1
-3.8\WML_tree_tools\preprocessed_addon"
-"""
-# print(" ".join([wesnoth_path, "--userdata-dir", userdata_path, "--preprocess-defines", "MULTIPLAYER,SKIP_CORE", "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path, addon_out_path]))
-call([wesnoth_path, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines", "MULTIPLAYER,SKIP_CORE", "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path, addon_out_path])
+def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE", OS="windows"):
+    def isWindows():
+        return OS == "windows"
+
+    log_files = set()
+    log_path = None
+    if isWindows():
+        wesnoth_dir = r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth"
+        wesnoth_exe = r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth\wesnoth.exe"
+        userdata_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.14"
+        input_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.14\data\add-ons\{}".format(addonId)
+        log_path = expanduser(join(userdata_path, "logs"))
+        log_files = set(os.listdir(log_path))
+    else:
+        wesnoth_dir = r"~/wesnoth/wesnoth-lobby"
+        wesnoth_exe = r"~/wesnoth/wesnoth-lobby/wesnoth"
+        userdata_path = r"~/wesnoth/userdata_1_14"
+        input_path = r"~/wesnoth/userdata_1_14/data/add-ons/{}".format(addonId)
+    addon_out_path = join("..", "preprocessed_addon", addonId)
+    core_out_path = join("..", "core")
+    core_path = expanduser(join(wesnoth_dir, "data"))
+    wesnoth_dir = expanduser(wesnoth_dir)
+    wesnoth_exe = expanduser(wesnoth_exe)
+    userdata_path = expanduser(userdata_path)
+    input_path = expanduser(input_path)
+    addon_out_path = expanduser(addon_out_path)
+    core_out_path = expanduser(core_out_path)
+
+    call([wesnoth_exe, "--data-dir", wesnoth_dir, "--preprocess-defines", preprocess_defines, "-p", core_path,
+          core_out_path, "--preprocess-output-macros"])
+    if isWindows():
+        log_files = printNewLogFiles(log_path, log_files)
+
+    call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
+          preprocess_defines, "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path,
+          addon_out_path])
+    if isWindows():
+        log_files = printNewLogFiles(log_path, log_files)
+
+
+if __name__ == '__main__':
+    preprocess_addon("Ageless_Era")
