@@ -3,10 +3,6 @@ import os
 from subprocess import call
 from os.path import join, expanduser
 
-versions = ["1.14"]
-version = "1.14"
-assert version in versions
-
 
 def printNewLogFiles(log_path, old_log_files):
     new_log_files = os.listdir(log_path)
