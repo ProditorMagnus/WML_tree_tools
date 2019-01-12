@@ -94,6 +94,9 @@ class StringNode:
         else:
             return "'%s'" % self.data.decode("utf8", "ignore")
 
+    def __str__(self):
+        return self.debug()
+
 class AttributeNode:
     """
     A WML attribute. For example the "id=Elfish Archer" in:
@@ -144,6 +147,9 @@ class AttributeNode:
 
     def get_name(self):
         return self.name.decode("utf8")
+
+    def __str__(self):
+        return "AttributeNode({}={})".format(self.get_name(),self.get_text())
 
 class TagNode:
     """
@@ -273,6 +279,9 @@ class TagNode:
 
     def get_name(self):
         return self.name.decode("utf8")
+
+    def __str__(self):
+        return "TagNode({})".format(self.get_name())
 
 class RootNode(TagNode):
     """
