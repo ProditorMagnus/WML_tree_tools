@@ -276,8 +276,16 @@ def parse_wml_query(query):
 # parsed_query[1][1] = lambda x: x % 3 == 1
 
 if __name__ == '__main__':
-    parsed_query = [parse_wml_query("[units]/[unit_type]/level==0")]
-    output_keys = ["id"]
+    # parsed_query = [parse_wml_query("[units]/[unit_type]/level==0")]
+    parsed_query = [parse_wml_query("[units]/[unit_type]/hitpoints>0")]
+    y = [0]
+    def inc(x):
+        if x > y[0]:
+            y[0]=x
+            return True
+        return False
+    parsed_query[0][1][1] = inc
+    output_keys = ["id","hitpoints"]
     print(parsed_query)
 
     root_node = load_root_node("Ageless_Era")
