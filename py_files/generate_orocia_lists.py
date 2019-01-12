@@ -56,7 +56,7 @@ def result_function(description, path, attributes):
 
 
 addonId = "Ageless_Era"
-root_node = rav_parser.parse_root_node(join("..", "preprocessed_addon", addonId, "_main.cfg"))
+root_node = rav_parser.load_root_node(addonId)
 
 for current_level, var_name in [(0, "ORM.unit.level_zero"), (1, "ORM.unit.level_one"), (2, "ORM.unit.level_two"),
                                 (3, "ORM.unit.level_three"), (4, "ORM.unit.level_four")]:

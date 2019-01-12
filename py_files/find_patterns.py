@@ -1,4 +1,3 @@
-from os.path import join
 import rav_parser
 from typing import List, Tuple
 
@@ -6,7 +5,7 @@ Attribute = Tuple[str, str]
 Attributes = List[Attribute]
 
 addonId = "Ageless_Era"
-root_node = rav_parser.parse_root_node(join("..", "preprocessed_addon", addonId, "_main.cfg"))
+root_node = rav_parser.load_root_node(addonId)
 
 
 def check_damage_types():

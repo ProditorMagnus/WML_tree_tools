@@ -14,7 +14,7 @@ mode = 0b01001000  # program settings
 # 1: show real
 # 2: show extra
 # 3: not used
-# 4: cache
+# 4: cache not used
 # 5: check performance
 
 # takes more room this way, consider putting them to separate variables
@@ -42,26 +42,16 @@ def perf():
     return mode & 0b00000100
 
 
-def parse_root_node(path):
-    # TODO add cache for each addon
-    main = wmlparser3.Parser()
-    root_node = main.parse_file(path)
-    return root_node
-
-
-def load_ageless_root_node():
-    # TODO remove in favor of parse_root_node
-    if not cache():
-        raise NotImplementedError("preprocess separately")
+def load_root_node(addonId):
+    pickle_name = "node_cache_{}.pickle".format(addonId)
+    if isfile(pickle_name):
+        with open(pickle_name, "rb") as f:
+            node = pickle.load(f)
     else:
-        if isfile("node_cache.pickle"):
-            with open("node_cache.pickle", "rb") as f:
-                node = pickle.load(f)
-        else:
-            main = wmlparser3.Parser()
-            node = main.parse_file(join("..", "preprocessed_addon", "Ageless_Era", "_main.cfg"))
-            with open("node_cache.pickle", "wb") as f:
-                pickle.dump(node, f)
+        main = wmlparser3.Parser()
+        node = main.parse_file(join("..", "preprocessed_addon", addonId, "_main.cfg"))
+        with open(pickle_name, "wb") as f:
+            pickle.dump(node, f)
     return node
 
 
@@ -285,7 +275,7 @@ if __name__ == '__main__':
     output_keys = ["id"]
     print(parsed_query)
 
-    root_node = load_ageless_root_node()
+    root_node = load_root_node("Ageless_Era")
     if perf():
         import timeit
 
