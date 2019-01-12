@@ -168,21 +168,26 @@ def find_from_wml(node, path, query_list, output_keys, callable_function):
         if matches:
             printable_ids = []
             for n in path:
-                printable_values = []
+                printable_values = {}
                 if "*" in output_keys:
                     for attr in n.get_all(att=""):
                         val = attr.get_text()
                         if val is not None:
-                            printable_values.append((attr.get_name(), val))
+                            # Ignore _ because of https://github.com/wesnoth/wesnoth/issues/3862
+                            if attr.get_name() in printable_values and attr.get_name() != "_":
+                                print("WARN", attr.get_name(), "->", val, "already in", printable_values)
+                            printable_values[attr.get_name()] = val
                 else:
                     for output_key in output_keys:
                         val = n.get_text_val(output_key)
                         if val is not None:
-                            printable_values.append((output_key, val))
+                            # Ignore _ because of https://github.com/wesnoth/wesnoth/issues/3862
+                            if output_key in printable_values and output_key != "_":
+                                print("WARN", output_key, "->", val, "already in", printable_values)
+                            printable_values[output_key] = val
                 printable_ids.append(printable_values)
 
             if prod(): callable_function("found match at", printable_path, printable_ids)
-            # TODO dict not list of tuples
 
         for child in node.get_all():
             if isinstance(child, wmlparser3.TagNode):

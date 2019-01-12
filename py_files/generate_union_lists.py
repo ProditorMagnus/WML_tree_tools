@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-from os.path import join
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 import rav_parser
 
@@ -8,19 +7,16 @@ recruits = set()
 leaders = set()
 
 
-def result_function(description, path, attributes: List[List[Tuple[str, str]]]):
-    if attributes[0][0][1] != "Ageless Era":
+def result_function(description, path, attributes: List[Dict[str, str]]):
+    if attributes[0]["id"] != "Ageless Era":
         return
-    value: str
-    key: str
-    for (key, value) in attributes[1]:
-        if key == "leader":
-            add_all(value, leaders)
-        if key == "random_leader":
-            add_all(value, leaders)
-        if key == "recruit":
-            add_all(value, recruits)
-    print(attributes)
+    keys = attributes[1].keys()
+    if "leader" in keys:
+        add_all(attributes[1]["leader"], leaders)
+    if "random_leader" in keys:
+        add_all(attributes[1]["random_leader"], leaders)
+    if "recruit" in keys:
+        add_all(attributes[1]["recruit"], recruits)
 
 
 def add_all(value, var):

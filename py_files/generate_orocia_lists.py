@@ -49,7 +49,7 @@ def slice(level, start=0, end=-1):
 
 
 def result_function(description, path, attributes):
-    unit_id = attributes[1][0][1]
+    unit_id = attributes[1]["id"]
     if unit_id in blacklisted_units:
         return
     write(current_level, '\t"{}",\n'.format(unit_id))
