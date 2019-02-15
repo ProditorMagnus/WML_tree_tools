@@ -4,7 +4,7 @@ from typing import List, Dict
 Attributes = Dict[str, str]
 
 addonId = "Ageless_Era"
-root_node = rav_parser.load_root_node(addonId)
+root_node = rav_parser.load_root_node(addonId, False)
 
 
 def check_damage_types():
@@ -137,30 +137,57 @@ def check_duplicate_defense():
     print("Duplicate defense", units_with_multiple_tags)
 
 
-def check_filter_attack():
+def check_filter_attack_event_names():
     names = set()
+    allowed_names = {"attack", "attacker_hits", "attacker_misses", "defender_hits", "defender_misses", "attack_end"}
 
     def on_id(description, path, attributes: List[Attributes]):
         # print(description, path, attributes)
-        for key, value in attributes[2]:
-            if key == "name":
-                names.add(value)
+        if "name" in attributes[2]:
+            names.add(attributes[2]["name"])
 
     parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[event]/[filter_attack]")]
     output_keys = ["id", "name"]
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
-    print("names with filter_attack", names)
+    clean_names = set()
+    for name in names:
+        if "," in name:
+            clean_names.update(map(lambda x: x.replace(" ", "_"), name.split(",")))
+        else:
+            clean_names.add(name.replace(" ", "_"))
+    invalid_names = clean_names.difference(allowed_names)
+    if len(invalid_names) > 0:
+        print("all event names with filter_attack", names)
+        print("invalid event names with filter_attack", invalid_names)
+
+
+def check_unit_attribute_amount(attr, limit):
+    def attribute_value_function(description, path, attributes):
+        if attr not in attributes[1]:
+            return
+        value = int(attributes[1][attr])
+        if value > limit:
+            print("attribute_value_function", attr, value, description, path, attributes)
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]")]
+    output_keys = ["id", attr]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, attribute_value_function)
 
 
 def check_all():
     check_damage_types()
     check_movetype_names()
+
     find_id_without_prefix()
+
     check_duplicate_abilities()
     check_duplicate_resists()
     check_duplicate_defense()
+
+    check_filter_attack_event_names()
+
+    check_unit_attribute_amount("hitpoints", 142)
+    check_unit_attribute_amount("movement", 12)
     # TODO check weapon specials
 
-
-# check_filter_attack()
 check_all()
