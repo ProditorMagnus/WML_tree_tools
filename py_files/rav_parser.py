@@ -5,6 +5,7 @@ import pickle
 from os.path import join, isfile
 from collections import deque
 import wmlparser3
+import preprocess_addon
 
 #		 01234567
 mode = 0b01001000  # program settings
@@ -42,12 +43,13 @@ def perf():
     return mode & 0b00000100
 
 
-def load_root_node(addonId):
+def load_root_node(addonId, reload=False):
     pickle_name = "node_cache_{}.pickle".format(addonId)
-    if isfile(pickle_name):
+    if not reload and isfile(pickle_name):
         with open(pickle_name, "rb") as f:
             node = pickle.load(f)
     else:
+        preprocess_addon.preprocess_addon(addonId)
         main = wmlparser3.Parser()
         node = main.parse_file(join("..", "preprocessed_addon", addonId, "_main.cfg"))
         with open(pickle_name, "wb") as f:
@@ -279,13 +281,17 @@ if __name__ == '__main__':
     # parsed_query = [parse_wml_query("[units]/[unit_type]/level==0")]
     parsed_query = [parse_wml_query("[units]/[unit_type]/hitpoints>0")]
     y = [0]
+
+
     def inc(x):
         if x > y[0]:
-            y[0]=x
+            y[0] = x
             return True
         return False
+
+
     parsed_query[0][1][1] = inc
-    output_keys = ["id","hitpoints"]
+    output_keys = ["id", "hitpoints"]
     print(parsed_query)
 
     root_node = load_root_node("Ageless_Era")
