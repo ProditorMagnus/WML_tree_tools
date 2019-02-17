@@ -35,6 +35,6 @@ output_keys = ["id", "leader", "random_leader", "recruit"]
 rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, result_function)
 
 with open("union_recruits.txt", "w", encoding="utf8") as f:
-    f.write(",".join(recruits))
+    f.write(",".join(sorted(recruits)))
 with open("union_leaders.txt", "w", encoding="utf8") as f:
-    f.write(",".join(leaders))
+    f.write(",".join(sorted(leaders)))

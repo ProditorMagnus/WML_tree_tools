@@ -139,7 +139,8 @@ def check_duplicate_defense():
 
 def check_filter_attack_event_names():
     names = set()
-    allowed_names = {"attack", "attacker_hits", "attacker_misses", "defender_hits", "defender_misses", "attack_end"}
+    allowed_names = {"attack", "attacker_hits", "attacker_misses", "defender_hits", "defender_misses", "attack_end",
+                     "last_breath", "die"}
 
     def on_id(description, path, attributes: List[Attributes]):
         # print(description, path, attributes)
@@ -148,6 +149,8 @@ def check_filter_attack_event_names():
 
     parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[event]/[filter_attack]")]
     output_keys = ["id", "name"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[event]/[filter_second_attack]")]
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
     clean_names = set()
     for name in names:
@@ -188,6 +191,8 @@ def check_all():
 
     check_unit_attribute_amount("hitpoints", 142)
     check_unit_attribute_amount("movement", 12)
+    check_unit_attribute_amount("experience", 300)
     # TODO check weapon specials
+
 
 check_all()
