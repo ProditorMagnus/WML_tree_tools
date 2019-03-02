@@ -503,13 +503,12 @@ class Parser:
         Parse a WML fragment outside of strings.
         """
         if not line: return
+        if line.startswith(b"#textdomain "):
+            self.textdomain = line[12:].strip().decode("utf8")
+            return
         if not self.temp_key_nodes:
             line = line.lstrip()
             if not line: return
-
-            if line.startswith(b"#textdomain "):
-                self.textdomain = line[12:].strip().decode("utf8")
-                return
 
             # Is it a tag?
             if line.startswith(b"["):
@@ -757,35 +756,35 @@ if __name__ == "__main__":
 
 
         test(
-            """
-            [test]
-            a=1
-            [/test]
-            """, """
+"""
+[test]
+a=1
+[/test]
+""", """
 [test]
     a='1'
 [/test]
 """, "simple")
 
         test(
-            """
-            [+foo]
-            a=1
-            [/foo]
-            """, """
+"""
+[+foo]
+a=1
+[/foo]
+""", """
 [+foo]
     a='1'
 [/foo]
 """, "+foo without foo in toplevel")
 
         test(
-            """
-            [foo]
-            [+bar]
-            a=1
-            [/bar]
-            [/foo]
-            """, """
+"""
+[foo]
+[+bar]
+a=1
+[/bar]
+[/foo]
+""", """
 [foo]
     [+bar]
         a='1'
@@ -794,13 +793,13 @@ if __name__ == "__main__":
 """, "+foo without foo in child")
 
         test(
-            """
-            [test]
-            [foo]
-            a=1
-            [/foo]
-            [/test]
-            """, """
+"""
+[test]
+[foo]
+a=1
+[/foo]
+[/test]
+""", """
 [test]
     [foo]
         a='1'
@@ -809,17 +808,17 @@ if __name__ == "__main__":
 """, "subtag, part 1")
 
         test(
-            """
-            [test]
-            [foo]
-            a=1
-            [/foo]
-            [/test]
-            [+test]
-            [+foo]
-            [/foo]
-            [/test]
-            """, """
+"""
+[test]
+[foo]
+a=1
+[/foo]
+[/test]
+[+test]
+[+foo]
+[/foo]
+[/test]
+""", """
 [test]
     [foo]
         a='1'
@@ -828,11 +827,11 @@ if __name__ == "__main__":
 """, "subtag, part 2")
 
         test(
-            """
-            [test]
-            a, b, c = 1, 2, 3
-            [/test]
-            """, """
+"""
+[test]
+a, b, c = 1, 2, 3
+[/test]
+""", """
 [test]
     a='1'
     b='2'
@@ -841,11 +840,11 @@ if __name__ == "__main__":
 """, "multi assign")
 
         test(
-            """
-            [test]
-            a, b = 1, 2, 3
-            [/test]
-            """, """
+"""
+[test]
+a, b = 1, 2, 3
+[/test]
+""", """
 [test]
     a='1'
     b='2, 3'
@@ -853,11 +852,11 @@ if __name__ == "__main__":
 """, "multi assign 2")
 
         test(
-            """
-            [test]
-            a, b, c = 1, 2
-            [/test]
-            """, """
+"""
+[test]
+a, b, c = 1, 2
+[/test]
+""", """
 [test]
     a='1'
     b='2'
@@ -866,27 +865,27 @@ if __name__ == "__main__":
 """, "multi assign 3")
 
         test(
-            """
-            #textdomain A
-            #define X
-                _ "abc"
-            #enddef
-            #textdomain B
-            [test]
-            x = _ "abc" + {X}
-            [/test]
-            """, """
+"""
+#textdomain A
+#define X
+    _ "abc"
+#enddef
+#textdomain B
+[test]
+x = _ "abc" + {X}
+[/test]
+""", """
 [test]
     x=_<B>'abc' .. _<A>'abc'
 [/test]
 """, "textdomain")
 
         test(
-            """
-            [test]
-            x,y = _1,_2
-            [/test]
-            """, """
+"""
+[test]
+x,y = _1,_2
+[/test]
+""", """
 [test]
     x='_1'
     y='_2'
@@ -894,103 +893,103 @@ if __name__ == "__main__":
 """, "underscores")
 
         test(
-            """
-            [test]
-            a = "a ""quoted"" word"
-            [/test]
-            """,
-            """
-            [test]
-                a='a "quoted" word'
-            [/test]
-            """, "quoted")
+"""
+[test]
+a = "a ""quoted"" word"
+[/test]
+""",
+"""
+[test]
+    a='a "quoted" word'
+[/test]
+""", "quoted")
 
         test(
-            """
-            [test]
-            code = <<
-                "quotes" here
-                ""blah""
-            >>
-            [/test]
-            """,
-            """
-            [test]
-                code='
-                    "quotes" here
-                    ""blah""
-                '
-            [/test]
-            """, "quoted2")
+"""
+[test]
+code = <<
+    "quotes" here
+    ""blah""
+>>
+[/test]
+""",
+"""
+[test]
+    code='
+        "quotes" here
+        ""blah""
+    '
+[/test]
+""", "quoted2")
 
         test(
-            """
-            foo="bar"+
-            
-            
-            
-            "baz"
-            """,
-            """
-            foo='bar' .. 'baz'
-            """, "multi line string")
+"""
+foo="bar"+
+
+
+
+"baz"
+""",
+"""
+foo='bar' .. 'baz'
+""", "multi line string")
 
         test(
-            """
-            #define baz
-            
-            "baz"
-            #enddef
-            foo="bar"+{baz}
-            """,
-            """
-            foo='bar' .. 'baz'
-            """, "defined multi line string")
+"""
+#define baz
+
+"baz"
+#enddef
+foo="bar"+{baz}
+""",
+"""
+foo='bar' .. 'baz'
+""", "defined multi line string")
 
         test(
-            """
-            foo="bar" + "baz" # blah
-            """,
-            """
-            foo='bar' .. 'baz'
-            """, "comment after +")
+"""
+foo="bar" + "baz" # blah
+""",
+"""
+foo='bar' .. 'baz'
+""", "comment after +")
 
         test(
-            """
-            #define baz
-            "baz"
-            #enddef
-            foo="bar" {baz}
-            """,
-            """
-            foo='bar' .. 'baz'
-            """, "defined string concatenation")
+"""
+#define baz
+"baz"
+#enddef
+foo="bar" {baz}
+""",
+"""
+foo='bar' .. 'baz'
+""", "defined string concatenation")
 
         test(
-            """
-            #define A BLOCK
-            [{BLOCK}]
-            [/{BLOCK}]
-            #enddef
-            {A blah}
-            """,
-            """
-            [blah]
-            [/blah]
-            """, "defined tag")
+"""
+#define A BLOCK
+[{BLOCK}]
+[/{BLOCK}]
+#enddef
+{A blah}
+""",
+"""
+[blah]
+[/blah]
+""", "defined tag")
 
         test2(
-            """
-            [test]
-                a=1
-                b=2
-                a=3
-                b=4
-            [/test]
-            """, "3, 4", "multiatt",
-            lambda p:
-            p.get_all(tag="test")[0].get_text_val("a") + ", " +
-            p.get_all(tag="test")[0].get_text_val("b"))
+"""
+[test]
+    a=1
+    b=2
+    a=3
+    b=4
+[/test]
+""", "3, 4", "multiatt",
+    lambda p:
+        p.get_all(tag = "test")[0].get_text_val("a") + ", " +
+        p.get_all(tag = "test")[0].get_text_val("b"))
 
         sys.exit(0)
 
