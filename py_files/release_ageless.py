@@ -6,7 +6,7 @@ import preprocess_addon
 preprocess_addon.preprocess_addon("Ageless_Era")
 
 main_path = join("..", "preprocessed_addon", "Ageless_Era", "_main.cfg")
-out_path = join("..", "preprocessed_addon", "ageless_4_23.preprocessed.cfg")
+out_path = join("..", "preprocessed_addon", "ageless_4_24.preprocessed.cfg")
 
 with open(main_path, encoding="utf8") as f:
     with open(out_path, "w", encoding="utf8") as g:

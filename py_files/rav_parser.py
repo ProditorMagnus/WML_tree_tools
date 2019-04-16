@@ -57,6 +57,12 @@ def load_root_node(addonId, reload=False):
     return node
 
 
+def load_root_node_manual():
+    main = wmlparser3.Parser()
+    node = main.parse_file(join("..", "preprocessed_addon", "manual", "_main.cfg"))
+    return node
+
+
 def query_matches(node, path, query, exact=True):
     if path_invalidates_match(path, query[0], exact):
         return False

@@ -45,14 +45,17 @@ method can be used to query the value of an attribute.
 
 import os, glob, sys, re, subprocess, argparse, tempfile, shutil
 import atexit
+from typing import Union
 
 tempdirs_to_clean = []
-
+tmpfiles_to_clean = []
 
 @atexit.register
 def cleaner():
     for temp_dir in tempdirs_to_clean:
         shutil.rmtree(temp_dir, ignore_errors=True)
+    for temp_file in tmpfiles_to_clean:
+        os.remove(temp_file)
 
 
 class WMLError(Exception):
@@ -371,11 +374,13 @@ class Parser:
         """
         Parse a chunk of binary WML.
         """
-        temp = tempfile.NamedTemporaryFile(prefix="wmlparser_",
-                                           suffix=".cfg")
-        temp.write(binary)
-        temp.flush()
-        self.path = temp.name
+        td, tmpfilePath = tempfile.mkstemp(prefix="wmlparser_",
+                                            suffix=".cfg")
+        with open(tmpfilePath, 'wb') as temp:
+            temp.write(binary)
+        os.close(td)
+        self.path = tmpfilePath
+        tmpfiles_to_clean.append(tmpfilePath)
         if not self.no_preprocess:
             self.preprocess(defines)
         return self.parse()
@@ -424,7 +429,7 @@ class Parser:
                            out.decode("utf8") +
                            err.decode("utf8"))
 
-    def parse_line_without_commands_loop(self, line: str) -> str:
+    def parse_line_without_commands_loop(self, line: bytes) -> Union[None, bytes]:
         """
         Once the .plain commands are handled WML lines are passed to
         this.
@@ -518,7 +523,7 @@ class Parser:
                 self.handle_attribute(line)
         else:
             for i, segment in enumerate(line.split(b"+")):
-                segment = segment.lstrip(b" ")
+                segment = segment.lstrip(b" \t")
 
                 if i > 0:
                     # If the last segment is empty (there was a plus sign
