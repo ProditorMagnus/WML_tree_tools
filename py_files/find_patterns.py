@@ -67,6 +67,7 @@ def check_movetype_names():
             print("unknown movetype", movetype, description, path, attributes)
 
     def movetype_missing_function(description, path, attributes):
+        # TODO consider base_unit
         print("unit without movetype", description, path, attributes)
 
     parsed_query = [rav_parser.parse_wml_query("[units]/[movetype]/name")]
