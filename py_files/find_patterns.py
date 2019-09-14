@@ -34,6 +34,20 @@ def check_damage_types():
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, resist_type_function)
 
 
+def check_range():
+    """Finds nonstandard attack ranges"""
+
+    def range_check_function(description, path, attributes):
+        known_ranges = ["melee", "ranged", "artillery", "sapper", "kamikaze", "study"]
+        attack_range = attributes[2]["range"]
+        if attack_range not in known_ranges:
+            print("range_check_function", attack_range, description, path, attributes)
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[attack]/range")]
+    output_keys = ["id", "range"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, range_check_function)
+
+
 def check_movetype_names():
     """Finds missing or unknown movetypes"""
     # Core movetypes
@@ -179,6 +193,7 @@ def check_unit_attribute_amount(attr, limit):
 
 def check_all():
     check_damage_types()
+    check_range()
     check_movetype_names()
 
     find_id_without_prefix()
