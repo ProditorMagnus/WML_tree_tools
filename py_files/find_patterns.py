@@ -19,7 +19,7 @@ def check_damage_types():
 
     def resist_type_function(description, path, attributes):
         """Shows nonstandard resists"""
-        damage_types = ["arcane", "blade", "cold", "fire", "impact", "pierce"]
+        damage_types = ["arcane", "blade", "cold", "fire", "impact", "pierce", "secret"]
         resists = attributes[2]
         for res in resists:
             if res not in damage_types:
