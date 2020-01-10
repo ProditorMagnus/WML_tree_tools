@@ -4,6 +4,7 @@ from subprocess import call
 from os.path import join, expanduser
 import wesnoth_paths
 
+
 def printNewLogFiles(log_path, old_log_files):
     new_log_files = os.listdir(log_path)
     log_files = set(new_log_files).difference(old_log_files)
@@ -15,15 +16,12 @@ def printNewLogFiles(log_path, old_log_files):
 
 
 def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE"):
-    def isWindows():
-        return os.name == 'nt'
-
     log_files = set()
     log_path = None
     wesnoth_dir = wesnoth_paths.getWesnothDir()
     wesnoth_exe = wesnoth_paths.getWesnothExe()
     userdata_path = wesnoth_paths.getUserdataDir()
-    if isWindows():
+    if wesnoth_paths.isWindows():
         input_path = userdata_path + r"\data\add-ons\{}".format(addonId)
         log_path = expanduser(join(userdata_path, "logs"))
         log_files = set(os.listdir(log_path))
@@ -41,13 +39,13 @@ def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE"):
 
     call([wesnoth_exe, "--data-dir", wesnoth_dir, "--preprocess-defines", preprocess_defines, "-p", core_path,
           core_out_path, "--preprocess-output-macros"])
-    if isWindows():
+    if wesnoth_paths.isWindows():
         log_files = printNewLogFiles(log_path, log_files)
 
     call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
           preprocess_defines, "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path,
           addon_out_path])
-    if isWindows():
+    if wesnoth_paths.isWindows():
         log_files = printNewLogFiles(log_path, log_files)
 
 
