@@ -27,8 +27,8 @@ def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE"):
         log_files = set(os.listdir(log_path))
     else:
         input_path = userdata_path + "/data/add-ons/{}".format(addonId)
-    addon_out_path = join("..", "preprocessed_addon", addonId)
-    core_out_path = join("..", "core")
+    addon_out_path = join("..", "preprocessed_addon" + str(wesnoth_paths.version), addonId)
+    core_out_path = join("..", "core" + str(wesnoth_paths.version))
     core_path = expanduser(join(wesnoth_dir, "data"))
     wesnoth_dir = expanduser(wesnoth_dir)
     wesnoth_exe = expanduser(wesnoth_exe)

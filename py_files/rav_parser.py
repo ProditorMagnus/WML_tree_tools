@@ -6,6 +6,7 @@ from os.path import join, isfile
 from collections import deque
 import wmlparser3
 import preprocess_addon
+import wesnoth_paths
 
 #		 01234567
 mode = 0b01001000  # program settings
@@ -44,14 +45,14 @@ def perf():
 
 
 def load_root_node(addonId, reload=False):
-    pickle_name = "node_cache_{}.pickle".format(addonId)
+    pickle_name = "node_cache_{}_{}.pickle".format(wesnoth_paths.version, addonId)
     if not reload and isfile(pickle_name):
         with open(pickle_name, "rb") as f:
             node = pickle.load(f)
     else:
         preprocess_addon.preprocess_addon(addonId)
         main = wmlparser3.Parser()
-        node = main.parse_file(join("..", "preprocessed_addon", addonId, "_main.cfg"))
+        node = main.parse_file(join("..", "preprocessed_addon" + str(wesnoth_paths.version), addonId, "_main.cfg"))
         with open(pickle_name, "wb") as f:
             pickle.dump(node, f)
     return node
@@ -59,13 +60,13 @@ def load_root_node(addonId, reload=False):
 
 def load_root_node_manual():
     main = wmlparser3.Parser()
-    node = main.parse_file(join("..", "preprocessed_addon", "manual", "_main.cfg"))
+    node = main.parse_file(join("..", "preprocessed_addon" + str(wesnoth_paths.version), "manual", "_main.cfg"))
     return node
 
 
 def load_core_node():
     main = wmlparser3.Parser()
-    node = main.parse_file(join("..", "core", "_main.cfg"))
+    node = main.parse_file(join("..", "core" + str(wesnoth_paths.version), "_main.cfg"))
     return node
 
 
