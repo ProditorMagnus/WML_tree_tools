@@ -1,8 +1,13 @@
 #!/usr/bin/python3
 import os
-from subprocess import call
+import subprocess
 from os.path import join, expanduser
 import wesnoth_paths
+
+
+def call(args):
+    print("Running", args)
+    subprocess.call(args)
 
 
 def printNewLogFiles(log_path, old_log_files):

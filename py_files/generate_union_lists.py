@@ -2,6 +2,7 @@
 from typing import List, Tuple, Dict
 
 import rav_parser
+import wesnoth_paths
 
 recruits = set()
 leaders = set()
@@ -38,9 +39,9 @@ output_keys = ["id", "leader", "random_leader", "recruit"]
 
 rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, get_result_function("Ageless Era"))
 
-with open("union_recruits.txt", "w", encoding="utf8") as f:
+with open("union_recruits_{}.txt".format(wesnoth_paths.version), "w", encoding="utf8") as f:
     f.write(",".join(sorted(recruits)))
-with open("union_leaders.txt", "w", encoding="utf8") as f:
+with open("union_leaders_{}.txt".format(wesnoth_paths.version), "w", encoding="utf8") as f:
     f.write(",".join(sorted(leaders)))
 
 # default
@@ -50,7 +51,7 @@ root_node = rav_parser.load_core_node()
 
 rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, get_result_function("era_dunefolk"))
 
-with open("default_recruits.txt", "w", encoding="utf8") as f:
+with open("default_recruits_{}.txt".format(wesnoth_paths.version), "w", encoding="utf8") as f:
     f.write(",".join(sorted(recruits)))
-with open("default_leaders.txt", "w", encoding="utf8") as f:
+with open("default_leaders_{}.txt".format(wesnoth_paths.version), "w", encoding="utf8") as f:
     f.write(",".join(sorted(leaders)))
