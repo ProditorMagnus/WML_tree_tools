@@ -3,10 +3,12 @@ from os.path import join
 import re
 import preprocess_addon
 
+# Not needed, agreed with Soliton that wmlunits timeout will be large enough
+
 preprocess_addon.preprocess_addon("Ageless_Era")
 
 main_path = join("..", "preprocessed_addon", "Ageless_Era", "_main.cfg")
-out_path = join("..", "preprocessed_addon", "ageless_4_24.preprocessed.cfg")
+out_path = join("..", "preprocessed_addon", "ageless_4_25.preprocessed.cfg")
 
 with open(main_path, encoding="utf8") as f:
     with open(out_path, "w", encoding="utf8") as g:
