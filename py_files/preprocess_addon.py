@@ -2,7 +2,7 @@
 import os
 from subprocess import call
 from os.path import join, expanduser
-
+import wesnoth_paths
 
 def printNewLogFiles(log_path, old_log_files):
     new_log_files = os.listdir(log_path)
@@ -14,24 +14,21 @@ def printNewLogFiles(log_path, old_log_files):
     return old_log_files.union(new_log_files)
 
 
-def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE", OS="windows"):
+def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE"):
     def isWindows():
-        return OS == "windows"
+        return os.name == 'nt'
 
     log_files = set()
     log_path = None
+    wesnoth_dir = wesnoth_paths.getWesnothDir()
+    wesnoth_exe = wesnoth_paths.getWesnothExe()
+    userdata_path = wesnoth_paths.getUserdataDir()
     if isWindows():
-        wesnoth_dir = r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth"
-        wesnoth_exe = r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth\wesnoth.exe"
-        userdata_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.14"
-        input_path = r"C:\Users\Ravana\Documents\My Games\Wesnoth1.14\data\add-ons\{}".format(addonId)
+        input_path = userdata_path + r"\data\add-ons\{}".format(addonId)
         log_path = expanduser(join(userdata_path, "logs"))
         log_files = set(os.listdir(log_path))
     else:
-        wesnoth_dir = r"~/wesnoth/wesnoth-lobby"
-        wesnoth_exe = r"~/wesnoth/wesnoth-lobby/wesnoth"
-        userdata_path = r"~/wesnoth/userdata_1_14"
-        input_path = r"~/wesnoth/userdata_1_14/data/add-ons/{}".format(addonId)
+        input_path = userdata_path + "/data/add-ons/{}".format(addonId)
     addon_out_path = join("..", "preprocessed_addon", addonId)
     core_out_path = join("..", "core")
     core_path = expanduser(join(wesnoth_dir, "data"))

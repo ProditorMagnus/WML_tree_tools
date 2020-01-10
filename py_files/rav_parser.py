@@ -63,6 +63,12 @@ def load_root_node_manual():
     return node
 
 
+def load_core_node():
+    main = wmlparser3.Parser()
+    node = main.parse_file(join("..", "core", "_main.cfg"))
+    return node
+
+
 def query_matches(node, path, query, exact=True):
     if path_invalidates_match(path, query[0], exact):
         return False
