@@ -1,6 +1,6 @@
 import os
 
-version = 14
+version = 15
 
 
 def isWindows():
@@ -29,6 +29,6 @@ def getUserdataDir():
     if version == 14 and not isWindows():
         return r"~/wesnoth/userdata_1_14"
     if version == 14 and isWindows():
-        return r"C:\Users\Ravana\Documents\My Games\Wesnoth1.14"
+        return r"C:\Users\Ravana\Documents\My Games\Wesnoth1.15" # TODO make sure it is what is expected
     if version == 15 and isWindows():
         return r"C:\Users\Ravana\Documents\My Games\Wesnoth1.15"

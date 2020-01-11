@@ -47,7 +47,7 @@ with open("union_leaders_{}.txt".format(wesnoth_paths.version), "w", encoding="u
 # default
 recruits = set()
 leaders = set()
-root_node = rav_parser.load_core_node()
+# root_node = rav_parser.load_core_node()
 
 rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, get_result_function("era_dunefolk"))
 

@@ -20,7 +20,7 @@ def printNewLogFiles(log_path, old_log_files):
     return old_log_files.union(new_log_files)
 
 
-def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE"):
+def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE,__WML_TREE_TOOLS__"):
     log_files = set()
     log_path = None
     wesnoth_dir = wesnoth_paths.getWesnothDir()
@@ -42,13 +42,13 @@ def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE"):
     addon_out_path = expanduser(addon_out_path)
     core_out_path = expanduser(core_out_path)
 
-    call([wesnoth_exe, "--data-dir", wesnoth_dir, "--preprocess-defines", preprocess_defines, "-p", core_path,
-          core_out_path, "--preprocess-output-macros"])
-    if wesnoth_paths.isWindows():
-        log_files = printNewLogFiles(log_path, log_files)
+    # call([wesnoth_exe, "--data-dir", wesnoth_dir, "--preprocess-defines", preprocess_defines, "-p", core_path,
+    #       core_out_path, "--preprocess-output-macros"])
+    # if wesnoth_paths.isWindows():
+    #     log_files = printNewLogFiles(log_path, log_files)
 
     call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
-          preprocess_defines, "--preprocess-input-macros", join(core_out_path, "_MACROS_.cfg"), "-p", input_path,
+          preprocess_defines, "-p", input_path,
           addon_out_path])
     if wesnoth_paths.isWindows():
         log_files = printNewLogFiles(log_path, log_files)
