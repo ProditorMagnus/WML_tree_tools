@@ -58,8 +58,10 @@ def check_movetype_names():
                        'drakefoot', 'dunefoot', 'dunearmoredfoot', 'dunehorse', 'dunearmoredhorse']
 
     def movetype_name_list_function(description, path, attributes):
-        """Shows missing movetypes resists"""
-        known_movetypes.append(attributes[1]["name"])
+        movetypeName = attributes[1]["name"]
+        if movetypeName in known_movetypes:
+            print("duplicate movetype", movetypeName, description, path, attributes)
+        known_movetypes.append(movetypeName)
 
     def movetype_name_check_function(description, path, attributes):
         movetype = attributes[1]["movement_type"]
