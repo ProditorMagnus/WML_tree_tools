@@ -37,6 +37,10 @@ AE_mag_Goblin_Kamikaze
 AE_mrc_fanatics_Martyr
 AE_efm_imperialists_Sapper
 AE_mag_bug_3827
+AE_rhy_dw_Scorpio
+AE_rhy_dw_Ballista
+AE_fut_Nordhris_Northern_Warlord
+AE_fut_Nordhris_Wolfheart
 """.split())
 
 

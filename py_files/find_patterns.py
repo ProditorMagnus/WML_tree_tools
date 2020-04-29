@@ -56,6 +56,7 @@ def check_movetype_names():
                        'float', 'mountainfoot', 'dwarvishfoot', 'gruefoot', 'undeadfoot', 'undeadfly', 'undeadspirit',
                        'spirit', 'lizard', 'none', 'scuttlefoot', 'rodentfoot', 'drakefly', 'drakeglide', 'drakeglide2',
                        'drakefoot', 'dunefoot', 'dunearmoredfoot', 'dunehorse', 'dunearmoredhorse']
+    known_movetypes = []  # when loading _main.cfg, these are not needed
 
     def movetype_name_list_function(description, path, attributes):
         movetypeName = attributes[1]["name"]
