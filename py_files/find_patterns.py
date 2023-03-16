@@ -90,6 +90,7 @@ def find_id_without_prefix():
     unprefixed_ids = set()
     common_ids = ["leadership", "submerge", "nightstalk", "regenerates", "skirmisher", "feeding", "illumination",
                   "steadfast", "teleport", "ambush", "healing", "concealment", "curing"]
+    descriptions = set()
 
     def on_id(description, path, attributes: List[Attributes]):
         for path_attributes in attributes:
@@ -195,6 +196,17 @@ def check_unit_attribute_amount(attr, limit):
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, attribute_value_function)
 
 
+def find_missing_variation_id():
+    def on_id(description, path, attributes: List[Attributes]):
+        unit = attributes[1]["id"]
+        if "variation_id" not in attributes[2]:
+            print("Missing variation_id", attributes)
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[variation]")]
+    output_keys = ["id", "variation_id", "variation_name"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
+
+
 def check_all():
     check_damage_types()
     check_range()
@@ -214,4 +226,5 @@ def check_all():
     # TODO check weapon specials
 
 
-check_all()
+# check_all()
+find_missing_variation_id()

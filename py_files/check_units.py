@@ -15,6 +15,10 @@ def check_units():
 
     def unit_check_function(description, path, attributes):
         unit_id = attributes[1]["id"]
+        if "description" in attributes[1]:
+            desc = attributes[1]["description"]
+            if "<" in desc:
+                print(unit_id, "has <", desc)
         if "level" not in attributes[1]:
             print(unit_id, "has no level")
             return
@@ -30,7 +34,7 @@ def check_units():
                 unit_parents[advancement].add(unit_id)
 
     parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]")]
-    output_keys = ["id", "type", "level", "advances_to"]
+    output_keys = ["id", "type", "level", "advances_to", "description"]
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, unit_check_function)
 
     supported_units = set()
