@@ -207,12 +207,24 @@ def find_missing_variation_id():
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
 
 
+def find_missing_race_plural_name():
+    def on_id(description, path, attributes: List[Attributes]):
+        if "plural_name" not in attributes[1]:
+            print("Missing plural_name", attributes)
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[race]")]
+    output_keys = ["id", "name", "male_name", "female_name", "plural_name"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
+
+
 def check_all():
     check_damage_types()
     check_range()
     check_movetype_names()
 
     find_id_without_prefix()
+    find_missing_variation_id()
+    find_missing_race_plural_name()
 
     check_duplicate_abilities()
     check_duplicate_resists()
@@ -227,4 +239,3 @@ def check_all():
 
 
 # check_all()
-find_missing_variation_id()

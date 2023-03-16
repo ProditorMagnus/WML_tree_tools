@@ -56,7 +56,8 @@ def result_function(description, path, attributes):
     unit_id = attributes[1]["id"]
     if unit_id in blacklisted_units:
         return
-    write(current_level, '\t"{}",\n'.format(unit_id))
+    if unit_id.startswith("AE_"):
+        write(current_level, '\t"{}",\n'.format(unit_id))
 
 
 addonId = "Ageless_Era"
