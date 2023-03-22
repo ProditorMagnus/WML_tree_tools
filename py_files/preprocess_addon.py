@@ -7,7 +7,7 @@ import wesnoth_paths
 
 def call(args):
     print("Running", args)
-    subprocess.call(args)
+    subprocess.run(args)
 
 
 def printNewLogFiles(log_path, old_log_files):
@@ -49,7 +49,7 @@ def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE,__WML_TR
 
     call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
           preprocess_defines, "-p", input_path,
-          addon_out_path])
+          addon_out_path, "--wnoconsole"])
     if wesnoth_paths.isWindows():
         log_files = printNewLogFiles(log_path, log_files)
 
