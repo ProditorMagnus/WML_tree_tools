@@ -41,6 +41,8 @@ AE_rhy_dw_Scorpio
 AE_rhy_dw_Ballista
 AE_fut_Nordhris_Northern_Warlord
 AE_fut_Nordhris_Wolfheart
+AE_mag_Forest_Spirit
+AE_mag_Swamp_Spirit
 """.split())
 
 

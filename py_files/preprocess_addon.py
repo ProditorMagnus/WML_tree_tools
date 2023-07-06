@@ -55,4 +55,6 @@ def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE,__WML_TR
 
 
 if __name__ == '__main__':
+    # preprocess_addon("Era_of_Magic",preprocess_defines="MULTIPLAYER")
+    # preprocess_addon("To_Lands_Unknown",preprocess_defines="CAMPAIGN_TO_LANDS_UNKNOWN")
     preprocess_addon("Ageless_Era")
