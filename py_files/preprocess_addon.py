@@ -47,9 +47,12 @@ def preprocess_addon(addonId, preprocess_defines="MULTIPLAYER,SKIP_CORE,__WML_TR
     # if wesnoth_paths.isWindows():
     #     log_files = printNewLogFiles(log_path, log_files)
 
+    log_flag = "--log-to-file"
+    if wesnoth_paths.version == 16:
+        log_flag = "--wnoconsole"
     call([wesnoth_exe, "--data-dir", wesnoth_dir, "--userdata-dir", userdata_path, "--preprocess-defines",
           preprocess_defines, "-p", input_path,
-          addon_out_path, "--wnoconsole"])
+          addon_out_path, log_flag])
     if wesnoth_paths.isWindows():
         log_files = printNewLogFiles(log_path, log_files)
 

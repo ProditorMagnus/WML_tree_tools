@@ -1,6 +1,6 @@
 import os
 
-version = 16
+version = 17
 
 
 def isWindows():
