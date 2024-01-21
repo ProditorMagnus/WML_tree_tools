@@ -6,13 +6,19 @@ Attributes = Dict[str, str]
 addonId = "Ageless_Era"
 root_node = rav_parser.load_root_node(addonId, False)
 
-# TODO handle base units
-base_unit_of_unit = {}
+# unit -> base unit
+unit_to_base_unit = {}
 units = {}
 
 
 def populate_base_unit_data():
-    pass
+    def base_unit_function(description, path, attributes):
+        """Collects base units"""
+        unit_to_base_unit[attributes[1]["id"]] = attributes[2]["id"]
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[base_unit]")]
+    output_keys = ["id"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, base_unit_function)
 
 
 def check_damage_types():
@@ -78,8 +84,8 @@ def check_movetype_names():
             print("unknown movetype", movetype, description, path, attributes)
 
     def movetype_missing_function(description, path, attributes):
-        # TODO consider base_unit
-        print("unit without movetype", description, path, attributes)
+        if attributes[1]["id"] not in unit_to_base_unit:
+            print("unit without movetype", description, path, attributes)
 
     parsed_query = [rav_parser.parse_wml_query("[units]/[movetype]/name")]
     output_keys = ["id", "name"]
@@ -264,5 +270,6 @@ def check_all():
     # TODO check weapon specials
 
 
+populate_base_unit_data()
 check_all()
 # check_unit_xp_level()

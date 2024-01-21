@@ -14,6 +14,8 @@ def getWesnothDir():
         return r"C:\Users\Ravana\games\Battle for Wesnoth 1.15.14"
     if version == 16 and isWindows():
         return r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth"
+    if version == 17 and isWindows():
+        return r"C:\Users\Ravana\games\battle-for-wesnoth-1.17.24"
 
 
 def getWesnothExe():
@@ -23,6 +25,8 @@ def getWesnothExe():
         return r"C:\Users\Ravana\games\Battle for Wesnoth 1.15.14\wesnoth.exe"
     if version == 16 and isWindows():
         return r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth\wesnoth.exe"
+    if version == 17 and isWindows():
+        return r"C:\Users\Ravana\games\battle-for-wesnoth-1.17.24\wesnoth_1_17_24.exe"
 
 
 def getUserdataDir():
@@ -32,3 +36,5 @@ def getUserdataDir():
         return r"C:\Users\Ravana\Documents\My Games\Wesnoth1.15"
     if version == 16 and isWindows():
         return r"C:\Users\Ravana\Documents\My Games\Wesnoth1.16"
+    if version == 17 and isWindows():
+        return r"C:\Users\Ravana\Documents\My Games\Wesnoth1.17"
