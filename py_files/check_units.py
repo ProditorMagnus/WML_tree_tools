@@ -19,13 +19,13 @@ def check_units():
             desc = attributes[1]["description"]
             if "<" in desc:
                 print(unit_id, "has <", desc)
-        if "level" not in attributes[1]:
+        if "level" not in attributes[1] and not unit_id.endswith("_rpg"):
             print(unit_id, "has no level")
             return
         unit_level = attributes[1]["level"]
         unit_levels[unit_id] = int(unit_level)
         if "advances_to" not in attributes[1]:
-            print(unit_id, "has no advances_to")
+            # print(unit_id, "has no advances_to")
             return
         advances_to = attributes[1]["advances_to"]
         if advances_to is not None:

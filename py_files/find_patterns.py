@@ -6,6 +6,14 @@ Attributes = Dict[str, str]
 addonId = "Ageless_Era"
 root_node = rav_parser.load_root_node(addonId, False)
 
+# TODO handle base units
+base_unit_of_unit = {}
+units = {}
+
+
+def populate_base_unit_data():
+    pass
+
 
 def check_damage_types():
     """Finds nonstandard resists and damage types"""
@@ -217,6 +225,24 @@ def find_missing_race_plural_name():
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
 
 
+def check_unit_xp_level():
+    attr = "experience"
+
+    def attribute_value_function(description, path, attributes):
+        if attr not in attributes[1]:
+            return
+        value = int(attributes[1][attr])
+
+        # TODO manually check those with custom amla
+        if "advances_to" not in attributes[1] or attributes[1]["advances_to"] == "null":
+            if value <= 126:
+                print("check_unit_xp_level", attr, value, description, path, attributes)
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]")]
+    output_keys = ["id", attr, "level", "advances_to"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, attribute_value_function)
+
+
 def check_all():
     check_damage_types()
     check_range()
@@ -238,4 +264,5 @@ def check_all():
     # TODO check weapon specials
 
 
-# check_all()
+check_all()
+# check_unit_xp_level()

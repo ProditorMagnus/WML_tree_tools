@@ -43,6 +43,11 @@ AE_fut_Nordhris_Northern_Warlord
 AE_fut_Nordhris_Wolfheart
 AE_mag_Forest_Spirit
 AE_mag_Swamp_Spirit
+AE_stf_triththa_Ballista
+AE_arc_phantom_Vapor
+AE_FL_altaris_Conjurer_illusion
+AE_FL_altaris_Illusionist_illusion
+AE_FL_altaris_Master_of_Illusion_illusion
 """.split())
 
 
