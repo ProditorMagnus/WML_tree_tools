@@ -1,6 +1,6 @@
 import os
 
-version = 17
+version = 18
 
 
 def isWindows():
@@ -16,6 +16,8 @@ def getWesnothDir():
         return r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth"
     if version == 17 and isWindows():
         return r"C:\Users\Ravana\games\battle-for-wesnoth-1.17.24"
+    if version == 18 and isWindows():
+        return r"C:\Users\Ravana\games\battle-for-wesnoth-1.17.26"
 
 
 def getWesnothExe():
@@ -27,6 +29,8 @@ def getWesnothExe():
         return r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth\wesnoth.exe"
     if version == 17 and isWindows():
         return r"C:\Users\Ravana\games\battle-for-wesnoth-1.17.24\wesnoth_1_17_24.exe"
+    if version == 18 and isWindows():
+        return r"C:\Users\Ravana\games\battle-for-wesnoth-1.17.26\wesnoth_1_17_26.exe"
 
 
 def getUserdataDir():
@@ -38,3 +42,5 @@ def getUserdataDir():
         return r"C:\Users\Ravana\Documents\My Games\Wesnoth1.16"
     if version == 17 and isWindows():
         return r"C:\Users\Ravana\Documents\My Games\Wesnoth1.17"
+    if version == 18 and isWindows():
+        return r"C:\Users\Ravana\Documents\My Games\Wesnoth1.17"  # TODO at some point it should be 18

@@ -4,6 +4,13 @@ from os.path import join
 import rav_parser
 
 units = ["", "", "", "", "", ""]
+unit_ids = {
+    0: set(),
+    1: set(),
+    2: set(),
+    3: set(),
+    4: set()
+}
 
 blacklisted_units = set("""AE_agl_steelhive_Lightshifter
 AE_arc_khthon_Terrapin_Hiding
@@ -55,16 +62,12 @@ def write(level, text):
     units[level] += text
 
 
-def slice(level, start=0, end=-1):
-    units[level] = units[level][start:end]
-
-
 def result_function(description, path, attributes):
     unit_id = attributes[1]["id"]
     if unit_id in blacklisted_units:
         return
     if unit_id.startswith("AE_"):
-        write(current_level, '\t"{}",\n'.format(unit_id))
+        unit_ids[current_level].add(unit_id)
 
 
 addonId = "Ageless_Era"
@@ -77,10 +80,11 @@ for current_level, var_name in [(0, "ORM.unit.level_zero"), (1, "ORM.unit.level_
 
     write(current_level, var_name + ' = {\n')
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, result_function)
-    slice(current_level, 0, -2)
+    for unit_id in sorted(unit_ids[current_level]):
+        write(current_level, '\t"{}",\n'.format(unit_id))
     write(current_level, '}')
 
-with open("data_generated_units.lua", "w", encoding="utf8") as f:
+with open("../output/data_generated_units.lua", "w", encoding="utf8") as f:
     f.write("--<<\n")
     f.write("-- This file is regenerated for each ageless release\n")
     for u in units:
