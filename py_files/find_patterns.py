@@ -102,16 +102,37 @@ def check_movetype_names():
 
 def find_id_without_prefix():
     unprefixed_ids = set()
-    common_ids = ["leadership", "submerge", "nightstalk", "regenerates", "skirmisher", "feeding", "illumination",
-                  "steadfast", "teleport", "ambush", "healing", "concealment", "curing"]
+    whitelist_ids = [
+        # mainline ids
+        "leadership", "submerge", "nightstalk", "regenerates", "skirmisher", "feeding", "illumination",
+        "steadfast", "teleport", "ambush", "healing", "concealment", "curing", "berserk", "plague", "firststrike",
+        "slow", "marksman", 'stun', 'absorb', 'deflect', 'magical', 'poison', 'backstab', 'diversion', 'swarm',
+        'drains', 'charge', 'burrow',
+        # non-event based non-filtered ids are not important
+        'rage5', 'rage4', "rage3", "rage2", "leader_moral", "counter",
+        "undeadheal8", "undeadheal5", "undeadheal4",
+        "aoadiscipline", "protection", "darkillumination", "eeawdiscipline", "drumbeat", "inspire1", 'inspire2',
+        'mountainambush',
+        'low_upkeep', 'small cold protection', 'auraofweakness', 'caveambush', 'dauntless', 'self_repair',
+        'regenerates4', 'terror', 'unlucky', 'snow_cover', 'repair', 'snow_hide', 'aoaRepair',
+        'plague_lesser_assimilation', 'delumination', 'swampambush', 'selfheal', 'swamp_lurk', 'distract',
+        'flddefender', 'auraoflife', 'reinkarnacja', 'sealpack', 'flawetxt', 'parry', 'defend-only', 'flawe',
+        'waterambush', 'steelskin', 'berserker', 'mech_healing', 'rally',
+        # false positives
+        "plague(AE_efm_pygmies_Toad)", "plague(Fire Ant Egg)", "plague(AE_ext_monsters_Baby_Mudcrawler)",
+        "plague(Giant Ant Egg)", 'plague(AE_agl_yokai_Swarm_Spawn)', 'plague(AE_mrc_Blight_Parasite)',
+        'plague(AE_rhy_ne_Black_Skeleton)', 'plague(AE_mrc_Blight_Infected)', 'plague(AE_mrc_slavers_Slave)',
+        'plague(AE_ele_Skeletal_Corpse)', 'plague(AE_efm_pygmies_Lizard)', 'plague(AE_mrc_infernai_Imp)',
+        'plague(AE_mrc_hive_Gnat)', 'plague(AE_rhy_de_Spiderling)', 'plague(AE_myh_Bloodborn)'
+    ]
     descriptions = set()
 
     def on_id(description, path, attributes: List[Attributes]):
-        for path_attributes in attributes:
+        for path_attributes in attributes[2:]:
             if "id" in path_attributes:
                 value = path_attributes["id"]
                 if not value.startswith("AE_"):
-                    if value not in common_ids:
+                    if value not in whitelist_ids:
                         unprefixed_ids.add(value)
 
     parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[abilities]/[?]")]
@@ -272,4 +293,5 @@ def check_all():
 
 populate_base_unit_data()
 check_all()
-# check_unit_xp_level()
+
+# find_id_without_prefix()
