@@ -49,7 +49,11 @@ recruits = set()
 leaders = set()
 # root_node = rav_parser.load_core_node()
 
-rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, get_result_function("era_dunefolk"))
+if wesnoth_paths.version < 19:
+    coreEra = "era_dunefolk"
+else:
+    coreEra = "era_default"
+rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, get_result_function(coreEra))
 
 with open("../output/default_recruits_{}.txt".format(wesnoth_paths.version), "w", encoding="utf8") as f:
     f.write(",".join(sorted(recruits)))

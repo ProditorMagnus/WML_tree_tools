@@ -270,7 +270,22 @@ def check_unit_xp_level():
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, attribute_value_function)
 
 
+def find_duplicate_weapon_name():
+    knownAttacks = set()
+    def on_id(description, path, attributes: List[Attributes]):
+        attackId = attributes[1]["id"] + "__" + attributes[2]["name"]
+        if attackId in knownAttacks:
+            print("find_duplicate_weapon_name", attackId)
+        else:
+            knownAttacks.add(attackId)
+
+    parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]/[attack]")]
+    output_keys = ["id", "name"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
+
+
 def check_all():
+    populate_base_unit_data()
     check_damage_types()
     check_range()
     check_movetype_names()
@@ -291,7 +306,6 @@ def check_all():
     # TODO check weapon specials
 
 
-populate_base_unit_data()
-check_all()
+# check_all()
 
-# find_id_without_prefix()
+find_duplicate_weapon_name()
