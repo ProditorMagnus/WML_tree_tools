@@ -301,11 +301,11 @@ def check_all():
     check_filter_attack_event_names()
 
     check_unit_attribute_amount("hitpoints", 142)
-    check_unit_attribute_amount("movement", 12)
+    check_unit_attribute_amount("movement", 13)
     check_unit_attribute_amount("experience", 300)
     # TODO check weapon specials
 
 
-# check_all()
+check_all()
 
-find_duplicate_weapon_name()
+# find_duplicate_weapon_name()
