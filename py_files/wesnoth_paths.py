@@ -9,14 +9,14 @@ def isWindows():
 
 def getWesnothDir():
     if version == 19 and isWindows():
-        return r"C:\Users\Ravana\games\battle-for-wesnoth-1.19.7"
+        return r"C:\Users\Ravana\games\battle-for-wesnoth-1.19.13"
     if version == 18 and isWindows():
         return r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth"
 
 
 def getWesnothExe():
     if version == 19 and isWindows():
-        return r"C:\Users\Ravana\games\battle-for-wesnoth-1.19.7\wesnoth.exe"
+        return r"C:\Users\Ravana\games\battle-for-wesnoth-1.19.13\wesnoth.exe"
     if version == 18 and isWindows():
         return r"C:\Program Files (x86)\Steam\steamapps\common\wesnoth\wesnoth.exe"
 

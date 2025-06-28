@@ -8,7 +8,7 @@ root_node = rav_parser.load_root_node(addonId, False)
 
 # unit -> base unit
 unit_to_base_unit = {}
-units = {}
+units = set()
 
 
 def populate_base_unit_data():
@@ -220,6 +220,7 @@ def check_filter_attack_event_names():
 
 def check_unit_attribute_amount(attr, limit):
     def attribute_value_function(description, path, attributes):
+        units.add(attributes[1]["id"])
         if attr not in attributes[1]:
             return
         value = int(attributes[1][attr])
@@ -283,6 +284,24 @@ def find_duplicate_weapon_name():
     output_keys = ["id", "name"]
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
 
+faction_units_checked=0
+def check_faction_units():
+    def on_id(description, path, attributes: List[Attributes]):
+        for unit_list_attr in ["leader", "random_leader", "recruit"]:
+            if unit_list_attr in attributes[1]:
+                for candidate_unit in attributes[1][unit_list_attr].split(","):
+                    candidate_unit=candidate_unit.strip()
+                    global faction_units_checked
+                    faction_units_checked+=1
+                    if candidate_unit not in units:
+                        print("check_faction_units unknown", candidate_unit, "used by", attributes[1]["id"])
+
+    parsed_query = [rav_parser.parse_wml_query("[era]/[multiplayer_side]")]
+    output_keys = ["id", "name", "leader", "random_leader", "recruit"]
+    rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
+    global faction_units_checked
+    print("checked", faction_units_checked, "units referenced from factions")
+
 
 def check_all():
     populate_base_unit_data()
@@ -304,6 +323,7 @@ def check_all():
     check_unit_attribute_amount("movement", 13)
     check_unit_attribute_amount("experience", 300)
     # TODO check weapon specials
+    check_faction_units() # depends on check_unit_attribute_amount
 
 
 check_all()
