@@ -8,41 +8,9 @@ import wmlparser3
 import preprocess_addon
 import wesnoth_paths
 
-#		 01234567
-mode = 0b01001000  # program settings
-
-
-# 0: show debug
-# 1: show real
-# 2: show extra
-# 3: not used
-# 4: cache not used
-# 5: check performance
-
-# takes more room this way, consider putting them to separate variables
-def debug():
-    return mode & 0b10000000
-
-
-def prod():
-    return mode & 0b01000000
-
-
+# log debug data
 def extra():
-    return mode & 0b00100000
-
-
-def _reserved_mode_():
-    return mode & 0b00010000
-
-
-def cache():
-    return mode & 0b00001000
-
-
-def perf():
-    return mode & 0b00000100
-
+    return False
 
 def load_root_node(addonId, reload=False):
     pickle_name = "node_cache_{}_{}.pickle".format(wesnoth_paths.version, addonId)
@@ -202,7 +170,7 @@ def find_from_wml(node, path, query_list, output_keys, callable_function):
                             printable_values[output_key] = val
                 printable_ids.append(printable_values)
 
-            if prod(): callable_function("found match at", printable_path, printable_ids)
+            callable_function("found match at", printable_path, printable_ids)
 
         for child in node.get_all():
             if isinstance(child, wmlparser3.TagNode):
@@ -259,7 +227,7 @@ def parse_wml_query(query):
                     found_operator = True
                     break
             if not found_operator:
-                if debug(): print("attr check set to not None")
+                if extra(): print("attr check set to not None")
                 attr_wanted = (item, lambda x: x is not None)
         if attr_wanted is None:
             attr_wanted = (item, lambda x: True)
@@ -308,12 +276,4 @@ if __name__ == '__main__':
     print(parsed_query)
 
     root_node = load_root_node("Ageless_Era")
-    if perf():
-        import timeit
-
-        start_time = timeit.default_timer()
-        find_from_wml(root_node, [], parsed_query, output_keys, print)
-        elapsed = timeit.default_timer() - start_time
-        print(elapsed)  # obsolete
-    else:
-        find_from_wml(root_node, [], parsed_query, output_keys, print)
+    find_from_wml(root_node, [], parsed_query, output_keys, print)
