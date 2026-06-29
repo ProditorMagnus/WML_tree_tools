@@ -8,7 +8,9 @@ root_node = rav_parser.load_root_node(addonId, False)
 
 # unit -> base unit
 unit_to_base_unit = {}
+unit_to_advancements = {}
 units = set()
+reachable_faction_units = set()
 
 
 def populate_base_unit_data():
@@ -292,11 +294,30 @@ def check_faction_units():
                     candidate_unit=candidate_unit.strip()
                     if candidate_unit not in units:
                         print("check_faction_units unknown", candidate_unit, "used by", attributes[1]["id"])
+                    reachable_faction_units.add(candidate_unit)
 
     parsed_query = [rav_parser.parse_wml_query("[era]/[multiplayer_side]")]
     output_keys = ["id", "name", "leader", "random_leader", "recruit"]
     rav_parser.find_from_wml(root_node, [], parsed_query, output_keys, on_id)
     print("checked units referenced from factions")
+    unitQueue = list(reachable_faction_units)
+    visitedUnits = set()
+    while len(unitQueue) > 0:
+        faction_unit = unitQueue.pop()
+        if faction_unit in visitedUnits:
+            continue
+        reachable_faction_units.add(faction_unit)
+        visitedUnits.add(faction_unit)
+        if faction_unit not in unit_to_advancements:
+            continue
+        for advancement in unit_to_advancements[faction_unit]:
+            unitQueue.append(advancement)
+    nonFactionUnits = set()
+    for unit in units:
+        if unit not in reachable_faction_units and unit.startswith("AE_"):
+            nonFactionUnits.add(unit)
+    print("Units not reachable from factions:", sorted(list(nonFactionUnits)))
+
 
 def check_advancement_units():
     def on_id(description, path, attributes: List[Attributes]):
@@ -305,6 +326,7 @@ def check_advancement_units():
                 candidate_unit=candidate_unit.strip()
                 if candidate_unit!="null" and candidate_unit not in units:
                     print("check_advancement_units unknown", candidate_unit, "used by", attributes[1]["id"])
+            unit_to_advancements[attributes[1]["id"]] = attributes[1]["advances_to"].split(",")
 
     parsed_query = [rav_parser.parse_wml_query("[units]/[unit_type]")]
     output_keys = ["id", "advances_to"]
@@ -347,9 +369,13 @@ def check_all():
     check_unit_attribute_amount("movement", 13)
     check_unit_attribute_amount("experience", 300)
 
-    check_faction_units() # depends on check_unit_attribute_amount
     check_advancement_units() # depends on check_unit_attribute_amount
+    check_faction_units() # depends on check_unit_attribute_amount and check_advancement_units
 
 check_all()
 #find_ability_without_name() # not used as real validation, should look weapon specials too
 # find_duplicate_weapon_name() # not used as real validation
+
+# check_unit_attribute_amount("experience", 300)
+# check_advancement_units() # depends on check_unit_attribute_amount
+# check_faction_units() # depends on check_unit_attribute_amount and check_advancement_units
